@@ -8,10 +8,10 @@
           <nuxt-link to="/">Accueil</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/catalogue-des-jeux">Jeux</nuxt-link>
+          <nuxt-link to="/catalogue-de-jeu">Jeux</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/about">À propos</nuxt-link>
+          <nuxt-link to="/a-propos">À propos</nuxt-link>
         </li>
       </ul>
 
