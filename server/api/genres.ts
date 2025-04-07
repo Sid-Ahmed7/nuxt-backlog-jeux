@@ -11,6 +11,7 @@ try {
         },
         body: `fields name;`,
     })
+    console.log('Réponse de l\'API:', response)
     return response
 } catch (error) {
     console.error('Erreur lors de la récupération des genres:', error)

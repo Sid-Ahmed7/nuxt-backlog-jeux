@@ -5,7 +5,10 @@ export interface Game {
       id: number
       image_id: string
     }
-    genres?: string
+    genres?: {
+      id: number
+      name: string
+    }[]
     platforms?: {
       id: number
       name: string

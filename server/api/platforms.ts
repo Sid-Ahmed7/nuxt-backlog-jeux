@@ -11,6 +11,7 @@ try {
         },
         body: `fields name; where id = (48, 167,6,169,49,130);`,
     })
+    console.log('Réponse de l\'API:', response)
     return response
 } catch (error) {
     console.error('Erreur lors de la récupération des genres:', error)
