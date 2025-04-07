@@ -9,6 +9,8 @@ const {getCoverUrl, formatReleaseDate} = useGameUtils()
 
 onMounted(async () => {
   await upComingGameStore.fetchUpComingGames()
+  console.log('Upcoming Games:', upComingGameStore.upComingGames);
+  
 })
 
 const upcomingGames = computed(() => {
@@ -38,8 +40,9 @@ const upcomingGames = computed(() => {
         </div>
         <div class="game-details">
           <h3>{{ game.name }}</h3>
-          <p>{{ game.release_dates }}</p>
-          <p>{{ game.genres }}</p>
+          <p>{{formatReleaseDate(game.release_dates) }}</p>
+          <p>{{ game.genres.map(genre => genre.name).join(', ') }}</p>
+
         </div>
       </div>
     </div>

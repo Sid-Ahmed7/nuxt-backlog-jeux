@@ -35,7 +35,7 @@ const lastOutingGames = computed(() => {
   <div class="last-outing">
     <div class="last-outing-header">
       <h2>Derniers jeux sortis</h2>
-      <nuxt-link to="/catalogue-des-jeux" class="see-more">Voir plus</nuxt-link>
+      <nuxt-link to="/catalogue-de-jeu" class="see-more">Voir plus</nuxt-link>
     </div>
     <div class="games-lists">
       <div v-for="game in lastOutingGames" :key="game.id" class="game-item">
@@ -45,7 +45,8 @@ const lastOutingGames = computed(() => {
         <div class="game-details">
           <h3>{{ game.name }}</h3>
           <p>{{ formatReleaseDate(game.first_release_date) }}</p>
-          <p>{{ game.genres }}</p>
+          <p>{{ game.genres.map(genre => genre.name).join(', ') }}</p>
+
         </div>
       </div>
     </div>
