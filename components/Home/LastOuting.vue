@@ -35,7 +35,7 @@ const lastOutingGames = computed(() => {
   <div class="last-outing">
     <div class="last-outing-header">
       <h2>Derniers jeux sortis</h2>
-      <nuxt-link to="/catalogue-de-jeu" class="see-more">Voir plus</nuxt-link>
+      <NuxtLink to="/catalogue-de-jeu" class="see-more">Voir plus</NuxtLink>
     </div>
     <div class="games-lists">
       <div v-for="game in lastOutingGames" :key="game.id" class="game-item">

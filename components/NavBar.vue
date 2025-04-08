@@ -13,9 +13,9 @@ const closeMenu = () => {
 <template>
   <nav class="nav">
     <div class="logo-container">
-      <nuxt-link to="/">
+      <NuxtLink to="/">
         <img src="../assets/images/logo.png" alt="Logo" id="logo" />
-      </nuxt-link>
+      </NuxtLink>
     </div>
 
     <div class="menu-icon" @click="toggleMenu">
@@ -24,13 +24,13 @@ const closeMenu = () => {
 
     <ul class="menu" :class="{ 'menu-open': isOpen }">
       <li>
-        <nuxt-link to="/">Accueil</nuxt-link>
+        <NuxtLink to="/">Accueil</NuxtLink>
       </li>
       <li>
-        <nuxt-link to="/catalogue-de-jeu">Jeux</nuxt-link>
+        <NuxtLink to="/catalogue-de-jeu">Jeux</NuxtLink>
       </li>
       <li>
-        <nuxt-link to="/a-propos">À propos</nuxt-link>
+        <NuxtLink to="/a-propos">À propos</NuxtLink>
       </li>
     </ul>
   </nav>

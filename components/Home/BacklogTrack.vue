@@ -18,7 +18,7 @@
           confondus, et enrichissez votre collection en quelques clics. Avec des mises à jour
           régulières, vous êtes toujours à jour.
         </p>
-        <nuxt-link class="link-button" to="/catalogue-des-jeux">Découvrir les jeux</nuxt-link>
+        <NuxtLink class="link-button" to="/catalogue-des-jeux">Découvrir les jeux</NuxtLink>
       </div>
     </section>
 
@@ -32,7 +32,7 @@
           échangez des conseils, créez des liens et trouvez de nouvelles pépites à ajouter à votre
           backlog.
         </p>
-        <nuxt-link class="link-button" to="/inscription">Rejoindre la communauté</nuxt-link>
+        <NuxtLink class="link-button" to="/inscription">Rejoindre la communauté</NuxtLink>
       </div>
     </section>
 </template>

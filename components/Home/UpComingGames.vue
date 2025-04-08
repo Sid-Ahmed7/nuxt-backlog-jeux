@@ -28,7 +28,7 @@ const upcomingGames = computed(() => {
   <div class="upcoming-games">
     <div class="upcoming-games-header">
       <h2>Jeux à venir</h2>
-      <nuxt-link to="/jeux" class="see-more">Voir plus</nuxt-link>
+      <NuxtLink to="/jeux" class="see-more">Voir plus</NuxtLink>
     </div>
     <div v-if="upcomingGames.length === 0">
       <p>Aucun jeu à venir.</p>
@@ -40,8 +40,8 @@ const upcomingGames = computed(() => {
         </div>
         <div class="game-details">
           <h3>{{ game.name }}</h3>
-          <p>{{formatReleaseDate(game.release_dates) }}</p>
-          <p>{{ game.genres.map(genre => genre.name).join(', ') }}</p>
+          <p>{{ formatReleaseDate(game.release_dates?.[0]) }}</p>
+          <p>{{ game.genres?.map(genre => genre.name).join(', ') }}</p>
 
         </div>
       </div>
