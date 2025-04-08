@@ -18,6 +18,9 @@ export const useGamesStore = defineStore('games', () => {
               genres: game.genres || [],
               first_release_date: game.first_release_date || 0,
               artworks: game.artworks ? game.artworks : undefined,
+              screenshots: game.screenshots ? game.screenshots : undefined,
+              game_modes: game.game_modes || [],
+              themes: game.themes || [],
               rating: game.rating || 0,
               platforms: game.platforms || [],
               year: game.first_release_date
