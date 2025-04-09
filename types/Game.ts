@@ -17,11 +17,11 @@ export interface Game {
     artworks?: {
       id: number
       image_id: string
-    }
+    }[]
     screenshots?: {
       id: number
       image_id: string
-    }
+    }[]
     game_modes?: {
       id: number
       name: string
@@ -38,7 +38,21 @@ export interface Game {
         name: string
       }
     }
-    rating?: number
-    year?: number
+    total_rating_count?: number
+    year?: number,
+    dlcs? : {
+      id: number
+      name: string
+    }[]
+    expanded_games?: {
+      id: number
+      name: string
+    }[]
+    similar_games?: {
+      id: number
+      name: string
+    }[]
+
+
   }
   

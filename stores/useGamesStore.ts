@@ -14,19 +14,26 @@ export const useGamesStore = defineStore('games', () => {
               id: game.id,
               name: game.name,
               cover: game.cover ? { id: game.cover.id, image_id: game.cover.image_id } : undefined,
-              summary: game.summary || undefined,
+              summary: game.summary,
               genres: game.genres || [],
               first_release_date: game.first_release_date || 0,
-              artworks: game.artworks ? game.artworks : undefined,
-              screenshots: game.screenshots ? game.screenshots : undefined,
+              artworks: game.artworks || [],
+              dlcs: game.dlcs || [],
+              similar_games: game.similar_games || [],
+              expanded_games: game.expanded_games || [],
+              screenshots: game.screenshots || [],
+              release_dates: game.release_dates || [],
+              involved_companies: game.invloved_companies || [],
               game_modes: game.game_modes || [],
               themes: game.themes || [],
-              rating: game.rating || 0,
+              rating: game.total_rating_count || 0,
               platforms: game.platforms || [],
               year: game.first_release_date
                 ? new Date(game.first_release_date * 1000).getFullYear()
                 : 0,
             }))
+
+            console.log(games.value)
     } catch (err) {
       error.value = 'Erreur lors de la récupération des jeux' + (err as Error).message
     } 
