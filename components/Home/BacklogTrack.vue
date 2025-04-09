@@ -18,7 +18,7 @@
           confondus, et enrichissez votre collection en quelques clics. Avec des mises à jour
           régulières, vous êtes toujours à jour.
         </p>
-        <NuxtLink class="link-button" to="/catalogue-des-jeux">Découvrir les jeux</NuxtLink>
+        <NuxtLink class="link-button" to="/catalogue-de-jeu">Découvrir les jeux</NuxtLink>
       </div>
     </section>
 
