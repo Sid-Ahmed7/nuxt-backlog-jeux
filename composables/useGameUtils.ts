@@ -5,6 +5,13 @@ export function useGameUtils() {
     return cover ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${cover}.jpg` : defaultCover
   }
 
+  const getArtworkUrl = (artwork: string | undefined): string => {
+    return artwork ? `https://images.igdb.com/igdb/image/upload/t_screenshot_med_2x/${artwork}.jpg` : defaultCover  
+  }
+
+  const getScreenshotUrl = (screenshot: string | undefined): string => {
+    return screenshot ? `https://images.igdb.com/igdb/image/upload/t_screenshot_big/${screenshot}.jpg` : defaultCover  
+  }
   const formatReleaseDate = (releaseDates: number | undefined): string => {
     if (releaseDates) {
       const releaseDate = new Date(releaseDates * 1000)
@@ -21,5 +28,5 @@ export function useGameUtils() {
     return 'Pas de note'
   }
 
-  return { getCoverUrl, formatReleaseDate, formatRating }
+  return { getCoverUrl, getArtworkUrl, getScreenshotUrl,formatReleaseDate, formatRating }
 }

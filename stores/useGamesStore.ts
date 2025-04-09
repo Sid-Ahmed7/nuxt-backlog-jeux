@@ -23,7 +23,6 @@ export const useGamesStore = defineStore('games', () => {
               expanded_games: game.expanded_games || [],
               screenshots: game.screenshots || [],
               release_dates: game.release_dates || [],
-              involved_companies: game.invloved_companies || [],
               game_modes: game.game_modes || [],
               themes: game.themes || [],
               rating: game.total_rating_count || 0,

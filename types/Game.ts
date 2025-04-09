@@ -32,7 +32,7 @@ export interface Game {
     }[]
     release_dates?: number[]
     first_release_date?: number
-    invloved_companies?: {
+    involved_companies?: {
       company: {
         id: number
         name: string
@@ -43,14 +43,26 @@ export interface Game {
     dlcs? : {
       id: number
       name: string
+      cover?: {
+        id: number
+        image_id: string
+      }
     }[]
     expanded_games?: {
       id: number
       name: string
+      cover?: {
+        id: number
+        image_id: string
+      }
     }[]
     similar_games?: {
       id: number
       name: string
+      cover?: {
+        id: number
+        image_id: string
+      }
     }[]
 
 

@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
                 Authorization: `Bearer ${config.api.accessToken}`,
                 'Content-Type': 'application/json',
             },
-            body: `fields name,summary,cover.image_id,artworks.image_id,screenshots.image_id,dlcs.name,expanded_games.name,similar_games.name,first_release_date,franchise,genres.name,involved_companies.company.name,platforms.name,total_rating_count,release_dates, game_modes.name, themes.name;limit ${limit}; offset ${offset}; sort first_release_date desc;`,
+            body: `fields name,summary,cover.image_id,artworks.image_id,screenshots.image_id,dlcs,expanded_games,similar_games,first_release_date,franchise,genres.name,involved_companies.company.name,platforms.name,total_rating_count,release_dates, game_modes.name, themes.name;limit ${limit}; offset ${offset}; sort first_release_date desc;`,
         })
     })
     const responses = await Promise.all(requests)
