@@ -40,12 +40,14 @@ const lastOutingGames = computed(() => {
     <div class="games-lists">
       <div v-for="game in lastOutingGames" :key="game.id" class="game-item">
         <div class="game-cover">
-          <img :src="getCoverUrl(game.cover?.image_id)" :alt="game.name" />
+          <NuxtLink :to="`/catalogue-de-jeu/${game.name}`">
+            <img :src="getCoverUrl(game.cover?.image_id)" :alt="game.name" />
+          </NuxtLink>
         </div>
         <div class="game-details">
           <h3>{{ game.name }}</h3>
           <p>{{ formatReleaseDate(game.first_release_date) }}</p>
-          <p>{{ game.genres.map(genre => genre.name).join(', ') }}</p>
+          <p>{{ game.genres?.map(genre => genre.name).join(', ') }}</p>
 
         </div>
       </div>

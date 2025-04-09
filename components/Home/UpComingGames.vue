@@ -28,7 +28,7 @@ const upcomingGames = computed(() => {
   <div class="upcoming-games">
     <div class="upcoming-games-header">
       <h2>Jeux à venir</h2>
-      <NuxtLink to="/jeux" class="see-more">Voir plus</NuxtLink>
+      <NuxtLink to="/catalogue-de-jeu" class="see-more">Voir plus</NuxtLink>
     </div>
     <div v-if="upcomingGames.length === 0">
       <p>Aucun jeu à venir.</p>
@@ -36,7 +36,9 @@ const upcomingGames = computed(() => {
     <div v-else class="games-lists">
       <div v-for="game in upcomingGames" :key="game.id" class="game-item">
         <div class="game-cover">
-          <img :src="getCoverUrl(game.cover?.image_id)" :alt="game.name" />
+          <NuxtLink :to="`/catalogue-de-jeu/${game.name}`">
+            <img :src="getCoverUrl(game.cover?.image_id)" :alt="game.name" />
+          </NuxtLink>
         </div>
         <div class="game-details">
           <h3>{{ game.name }}</h3>

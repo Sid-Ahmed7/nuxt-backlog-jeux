@@ -40,7 +40,9 @@ const topRatedGames = computed(() => {
     <div class="games-lists">
       <div v-for="game in topRatedGames" :key="game.id" class="game-item">
         <div class="game-cover">
-          <img :src="getCoverUrl(game.cover?.image_id)" :alt="game.name" />
+          <NuxtLink :to="`/catalogue-de-jeu/${game.name}`">
+            <img :src="getCoverUrl(game.cover?.image_id)" :alt="game.name" />
+          </NuxtLink>
         </div>
         <div class="game-details">
           <h3>{{ game.name }}</h3>
