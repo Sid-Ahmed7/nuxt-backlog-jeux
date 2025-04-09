@@ -2,7 +2,6 @@
 import { computed } from 'vue'
 import type { Game } from '@/types/Game'
 import { useGameUtils } from '@/composables/useGameUtils'
-import { NuxtLink } from '#components';
 
 const props = defineProps<{
   games: Game[]
@@ -27,7 +26,7 @@ const gridColumns = computed(() => {
       <ul :style="{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)` }">
         <li v-for="game in games" :key="game.id">
           
-          <NuxtLink :to="`/catalogue-de-jeu/${game?.name}`">
+          <NuxtLink :to="`/catalogue-de-jeu/${encodeURIComponent(game?.name || 'Jeu inconnu')}`">
             <div class="cover-image">
               <img
                 v-if="game.cover"
