@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+
 const isOpen = ref(false)
+const isLogin = useSupabaseUser()
 const toggleMenu = () => {
   isOpen.value = !isOpen.value
 }
-const closeMenu = () => {
-  isOpen.value = false
-}
+
 </script>
 
 <template>
@@ -31,6 +31,18 @@ const closeMenu = () => {
       </li>
       <li>
         <NuxtLink to="/a-propos">À propos</NuxtLink>
+      </li>
+      <li v-if="!isLogin">
+        <NuxtLink to="/login">Connexion</NuxtLink>
+      </li>
+      <li v-if="!isLogin">
+        <NuxtLink to="/signup">Inscription</NuxtLink>
+      </li>
+      <li v-if="isLogin">
+        <NuxtLink to="/profile">Profil</NuxtLink>
+      </li>
+      <li v-if="isLogin">
+        <NuxtLink to="/logout">Déconnexion</NuxtLink>
       </li>
     </ul>
   </nav>

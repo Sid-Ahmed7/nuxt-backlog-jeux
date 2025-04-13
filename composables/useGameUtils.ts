@@ -1,4 +1,5 @@
 import defaultCover from '@/assets/images/default_cover.png'
+import defaultBanner from '@/assets/images/default_banner.png'
 
 export function useGameUtils() {
   const getCoverUrl = (cover: string | undefined): string => {
@@ -6,7 +7,7 @@ export function useGameUtils() {
   }
 
   const getArtworkUrl = (artwork: string | undefined): string => {
-    return artwork ? `https://images.igdb.com/igdb/image/upload/t_screenshot_med_2x/${artwork}.jpg` : defaultCover  
+    return artwork ? `https://images.igdb.com/igdb/image/upload/t_screenshot_med_2x/${artwork}.jpg` : defaultBanner  
   }
 
   const getScreenshotUrl = (screenshot: string | undefined): string => {
