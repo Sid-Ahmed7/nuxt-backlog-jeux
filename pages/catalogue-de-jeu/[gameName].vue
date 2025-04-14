@@ -42,17 +42,22 @@ const markAsFinished = () => {
     <div class="game-info">
       <h1>{{ game?.name }}</h1>
       <div class="badges">
-        <span v-for="genre in game?.genres || []" :key="genre.id">🎮 {{ genre.name }}</span>
-        <span v-for="mode in game?.game_modes || []" :key="mode.id">🎮 {{ mode.name }}</span>
-        <span v-for="theme in game?.themes || []" :key="theme.id">🎮 {{ theme.name }}</span>
+        <span v-for="genre in game?.genres || []" :key="genre.id">{{ genre.name }}</span>
+        <span v-for="mode in game?.game_modes || []" :key="mode.id">{{ mode.name }}</span>
+        <span v-for="theme in game?.themes || []" :key="theme.id">{{ theme.name }}</span>
       </div>
     </div>
+
   </div>
+  <div class="action-buttons">
+  <button class="btn primary" @click="addToWishlist">Ajouter à ma liste</button>
+  <button class="btn secondary" @click="markAsFinished">Noter le jeu</button>
+</div>
 
   <div class="info-grid">
-    <div class="info-card">📆 Sortie : {{ formatReleaseDate(game?.first_release_date) }}</div>
-    <div class="info-card">💻 Plateformes : {{ game?.platforms?.map(p => p.name).join(', ') }}</div>
-    <div class="info-card">🧭 Genres : {{ game?.genres?.map(g => g.name).join(', ') }}</div>
+    <div class="info-card">Sortie : {{ formatReleaseDate(game?.first_release_date) }}</div>
+    <div class="info-card">Plateformes : {{ game?.platforms?.map(p => p.name).join(', ') }}</div>
+    <div class="info-card">Genres : {{ game?.genres?.map(g => g.name).join(', ') }}</div>
   </div>
 
   <div class="game-description">
@@ -111,6 +116,43 @@ const markAsFinished = () => {
   padding: 20px 30px;
   flex-wrap: wrap;
 }
+.action-buttons {
+  display: flex;
+  gap: 20px;
+  padding: 20px 30px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 12px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+
+}
+
+.btn.primary {
+  background-color: #8e24aa;
+  color: white;
+  border: none;
+}
+
+.btn.primary:hover {
+  background-color: #6a1b9a;
+}
+
+.btn.secondary {
+  background-color: transparent;
+  border: 2px solid #8e24aa;
+  color: #8e24aa;
+}
+
+.btn.secondary:hover {
+  background-color: #8e24aa;
+  color: white;
+}
+
 
 .info-card {
   background-color: #2c2c2c;
