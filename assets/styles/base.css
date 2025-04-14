@@ -14,7 +14,7 @@
     text-decoration: none;
   }
   
-  body {
+  main {
     min-height: 100vh;
     background: var(--background-color);
     line-height: 1.6;

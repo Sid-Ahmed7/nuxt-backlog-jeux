@@ -1,149 +1,55 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { createClient } from '@supabase/supabase-js';
+import type { UserProfile } from '@/types/UserProfile';
+import ProfileHeader from '@/components/Profile/ProfileHeader.vue';
+import NavBar from '@/components/Profile/NavBar.vue';
 
-const config = useRuntimeConfig()
 const supabase = useSupabaseClient()
+const router = useRouter()
 
-const email = ref('');
-const password = ref('');
-const errorMessage = ref('');
-const isSubmitting = ref(false);
+const user = ref<UserProfile |  null>(null)
 
-const router = useRouter();
 
-const handleSubmit = async () => {
-  errorMessage.value = '';
-  isSubmitting.value = true;
+const { data, error } = await supabase.auth.getUser()
+if( error || !data.user) {
+ router.push('/login')
+} 
 
-  try {
-    const {  error } = await supabase.auth.signInWithPassword({
-      email: email.value,
-      password: password.value,
-    });
+const { data: profile, error: profileError } = await supabase
+  .from('user_profiles')
+  .select('*')
+  .eq('user_id', data.user?.id || '')
+  .single<UserProfile>()
 
-    if (error) {
-      errorMessage.value = error.message;
-    } else {
-      router.push('/');
+  if(profile) {
+    user.value = {
+      ...data.user,
+      ...profile,
+    } } else {
+      router.push('/login')
     }
-  } catch (err) {
-    errorMessage.value = 'Une erreur est survenue. Veuillez réessayer.';
-  } finally {
-    isSubmitting.value = false;
-  }
-};
 </script>
 
 <template>
-  <div class="container">
-    <div class="card">
-      <h2>Se connecter</h2>
-      <form @submit.prevent="handleSubmit">
 
-        <!-- Email Field -->
-        <div class="form-group">
-          <input
-            type="email"
-            id="email"
-            placeholder="Email"
-            v-model="email"
-            required
-          />
-        </div>
+<div v-if="user" class="profile-container">
+<ProfileHeader :user="user"  />
+<NavBar />
+</div>
 
-        <!-- Password Field -->
-        <div class="form-group">
-          <input
-            type="password"
-            id="password"
-            placeholder="Mot de passe"
-            v-model="password"
-            required
-          />
-        </div>
-
-        <!-- Submit Button -->
-        <button type="submit" :disabled="isSubmitting">Se connecter</button>
-
-        <!-- Error Message -->
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-
-        <p class="switch">
-          Pas encore inscrit ? <NuxtLink to="/signup">S'inscrire</NuxtLink>
-        </p>
-      </form>
-    </div>
-  </div>
+<div v-else class="loading">
+  <p>Chargement du profil...</p>
+</div>
 </template>
 
 <style scoped>
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f7f7f7;
-}
 
-.card {
-  background: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-}
 
-h2 {
+
+.loading {
   text-align: center;
-  margin-bottom: 20px;
-  font-size: 24px;
-  font-weight: 600;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  border: none;
-  color: white;
-  font-size: 16px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.error-message {
-  color: red;
-  font-size: 14px;
-  text-align: center;
-}
-
-.switch {
-  text-align: center;
-  margin-top: 10px;
-}
-
-.switch a {
-  color: #007bff;
-  text-decoration: none;
+  margin-top: 50px;
+  font-size: 18px;
 }
 </style>
