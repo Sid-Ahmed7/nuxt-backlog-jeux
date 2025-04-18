@@ -19,6 +19,7 @@
   gap: 1rem;
   padding: 0.8rem;
   border-radius: 6px;
+  background-color: #2c2c2c;
 }
 
 .game-cover {
@@ -45,3 +46,15 @@
   font-size: 0.9rem;
   color: #b0b0b0;
 }
+@media screen and  (max-width: 1024px) {
+  .upcoming-games,
+  .rating-games,
+  .last-outing {
+  width: 100%;
+}
+}
+@media screen and (max-width: 768px) {
+
+}
+
+
