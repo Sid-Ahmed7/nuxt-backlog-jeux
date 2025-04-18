@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
         })
         return response
     } catch (error) {
-        console.error('Erreur lors de la récupération des jeux à venir:', error)
+        throw('Erreur lors de la récupération des jeux à venir:')
         return []
     }
 }
