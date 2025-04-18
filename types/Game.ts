@@ -30,7 +30,9 @@ export interface Game {
       id: number
       name: string
     }[]
-    release_dates?: number[]
+    release_dates?: {
+      date: number
+    }
     first_release_date?: number
     involved_companies?: {
       company: {
@@ -39,7 +41,7 @@ export interface Game {
       }
     }
     total_rating_count?: number
-    year?: number,
+    year?: number
     dlcs? : {
       id: number
       name: string

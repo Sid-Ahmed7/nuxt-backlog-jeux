@@ -16,9 +16,7 @@ export const useUpComingGames = defineStore('upComingGames', () => {
               name: release.game.name,
               cover: release.game.cover ? { id: release.game.cover.id, image_id: release.game.cover.image_id } : undefined,
               genres:release.game.genres || [],
-                release_dates: release.dates && Array.isArray(release.dates)
-                  ? release.dates.map((date: number) => date)
-                  : [],
+              release_dates: {date : release.date},
             }))
     } catch (err) {
       error.value = 'Erreur lors de la récupération des jeux' + (err as Error).message

@@ -18,12 +18,12 @@ const topRatedGames = computed(() => {
   }
 
   const topRated = gamesStore.games.filter((game) => {
-    return game.rating !== undefined
+    return game.total_rating_count !== undefined
   })
 
   return topRated
     .sort((a, b) => {
-      return (b.rating ?? 0) - (a.rating ?? 0)
+      return (b.total_rating_count ?? 0) - (a.total_rating_count ?? 0)
     })
     .slice(0, 5)
 })
@@ -46,7 +46,8 @@ const topRatedGames = computed(() => {
         </div>
         <div class="game-details">
           <h3>{{ game.name }}</h3>
-          <p>{{ formatRating(game.rating) }}</p>
+          <p>{{ game.genres?.map(genre => genre.name).join(', ') }}</p>
+          <p>{{ formatRating(game.total_rating_count) }}</p>
         </div>
       </div>
     </div>

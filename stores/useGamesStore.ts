@@ -22,10 +22,10 @@ export const useGamesStore = defineStore('games', () => {
               similar_games: game.similar_games || [],
               expanded_games: game.expanded_games || [],
               screenshots: game.screenshots || [],
-              release_dates: game.release_dates || [],
+              release_dates: game.release_dates ? {date : game.release_dates?.date} : undefined,
               game_modes: game.game_modes || [],
               themes: game.themes || [],
-              rating: game.total_rating_count || 0,
+              total_rating_count: game.total_rating_count || 0,
               platforms: game.platforms || [],
               year: game.first_release_date
                 ? new Date(game.first_release_date * 1000).getFullYear()

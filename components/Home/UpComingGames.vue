@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
-import { useUpComingGames } from '@/stores/useUpcomingGamesStore'
+import { useUpComingGames } from '@/stores/useUpComingGamesStore'
 import { useGameUtils } from '@/composables/useGameUtils'
 import '@/assets/styles/games-recommendations.css'
 
@@ -42,7 +42,7 @@ const upcomingGames = computed(() => {
         </div>
         <div class="game-details">
           <h3>{{ game.name }}</h3>
-          <p>{{ formatReleaseDate(game.release_dates?.[0]) }}</p>
+          <p>{{ formatReleaseDate(game.release_dates?.date) }}</p>
           <p>{{ game.genres?.map(genre => genre.name).join(', ') }}</p>
 
         </div>
