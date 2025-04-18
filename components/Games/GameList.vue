@@ -11,8 +11,6 @@ const props = defineProps<{
 
 const { getCoverUrl } = useGameUtils()
 
-
-
 const gridColumns = computed(() => {
   return props.colums ? props.colums : 8
 })

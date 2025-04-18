@@ -49,6 +49,7 @@ const filters = computed(() => {
       selectedPlatforms.value.length === 0 ||
       (Array.isArray(game.platforms) &&
         game.platforms.some((platform) => selectedPlatforms.value.includes(platform.name)))
+
         const matchesGenre =
         selectedGenres.value.length === 0 ||  
       (Array.isArray(game.genres) &&
@@ -88,7 +89,6 @@ const totalPages = computed(() => {
 <template>
   <div class="catalogue-view">
     <h1 class="catalogue-title">Catalogue des jeux</h1>
-
     <div class="search-bar">
       <SearchBar @search="onSearch" />
     </div>
@@ -127,10 +127,7 @@ const totalPages = computed(() => {
 
 <style scoped>
 .catalogue-view {
-  font-family: Arial, sans-serif;
   padding: 2rem 1rem;
-  background-color: #f4f7f6;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -139,11 +136,10 @@ const totalPages = computed(() => {
 .catalogue-title {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #333;
+  color: var(--main-color);
   margin-bottom: 2.5rem;
   text-align: center;
   width: 100%;
-  
 }
 
 .search-bar {
@@ -169,14 +165,14 @@ const totalPages = computed(() => {
 }
 
 .toggle-filters {
-  background-color: #4caf50;
+  background-color: var(--main-color);
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 1rem;
   font-size: 1rem;
   cursor: pointer;
-  border-radius: 5px;
-  margin-bottom: 20px;
+  border-radius: 0.5rem;
+  margin-bottom: 2rem;
 }
 .no-results {
   text-align: center;
@@ -190,7 +186,7 @@ const totalPages = computed(() => {
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 30px;
+  margin-top: 1.5rem;
   width: 100%;
 }
 
@@ -198,7 +194,6 @@ const totalPages = computed(() => {
   background-color: #007bff;
   color: white;
   border: none;
-
   margin: 0 5px;
   cursor: pointer;
   border-radius: 5px;

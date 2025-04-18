@@ -58,7 +58,7 @@ const pages = computed(() => {
 button {
   border: none;
   border-radius: 0.5rem;
-  padding: 1.5rem;
+  padding: 1rem;
   font-size: 1rem;
   cursor: pointer;
 }

@@ -86,7 +86,7 @@ watch(selectedRating, (newRating) => {
       <h3>Filtrer par note</h3>
       <USlider v-model="selectedRating" :min="1" :max="10" :step="0.1" color="green" />
       <div class="rating-display">
-        <span>⭐ {{ selectedRating[0].toFixed(1) }} - {{ selectedRating[1].toFixed(1) }}</span>
+        <span>{{ selectedRating[0].toFixed(1) }} - {{ selectedRating[1].toFixed(1) }}</span>
       </div>
     </div> -->
   </div>
@@ -96,11 +96,11 @@ watch(selectedRating, (newRating) => {
 .sidebar {
   width: 85%;
   background-color: #2d3a3f;
-  padding: 20px;
+  padding: 2rem;
   color: white;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 2rem;
   overflow-y: auto;
 }
 
@@ -111,7 +111,7 @@ watch(selectedRating, (newRating) => {
 
 h3 {
   font-size: 1.25rem;
-  margin-bottom: 10px;
+  margin-bottom: 1rem;
   font-weight: bold;
 }
 
@@ -119,27 +119,29 @@ h3 {
 .genre-item, .gameMode-item, .theme-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 5px;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
 
 input[type='checkbox'] {
   accent-color: #4caf50;
-  width: 16px;
-  height: 16px;
+  width: 1.5rem;
+  height: 1rem;
 }
 
 input[type='checkbox']:focus {
   outline: none;
-  box-shadow: 0 0 3px #4caf50;
+  box-shadow: 0 0 0.2rem #4caf50;
 }
 
 select {
-  padding: 10px;
-  border: 1px solid #4caf50;
+  padding: 0.5rem;
+  border: 0.5rem solid #4caf50;
   background-color: #1a2427;
   color: white;
-  border-radius: 5px;
+  border-radius: 0.25rem;
 }
 
 option {
@@ -149,7 +151,7 @@ option {
 
 select:focus {
   outline: none;
-  box-shadow: 0 0 3px #4caf50;
+  box-shadow: 0 0 0.25rem #4caf50;
 }
 /* .rating-filter {
   display: flex;
@@ -172,7 +174,7 @@ input[type='number']:focus {
   color: #00bfff;
   text-decoration: none;
   font-size: 0.9rem;
-  margin-top: 5px;
+  margin-top: 1rem;
   cursor: pointer;
   transition: color 0.2s ease;
 }

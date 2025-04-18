@@ -9,7 +9,7 @@ const router = useRouter()
 const logout = async () => {
   const { error } = await supabase.auth.signOut()
   if (error) {
-    console.error('Error lors de la déconnexion:', error.message)
+    throw('Error lors de la déconnexion:')
   } else {
     router.push('/')
   }
