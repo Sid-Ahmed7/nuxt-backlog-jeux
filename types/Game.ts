@@ -11,7 +11,11 @@ export interface Game {
     }[]
     platforms?: {
       id: number
-      name: string
+      name: string,
+      platform_logo?: {
+        id: number
+        image_id: string
+      }
     }[]
     summary?: string
     artworks?: {

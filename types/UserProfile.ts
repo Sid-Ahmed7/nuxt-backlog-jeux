@@ -1,3 +1,4 @@
+import type { Game } from "./Game";
 
 export interface UserProfile {
     id: string; 
@@ -5,5 +6,6 @@ export interface UserProfile {
     avatarUrl: string;
     bannerUrl: string;
     bio: string;
+    game: Game;
   }
   

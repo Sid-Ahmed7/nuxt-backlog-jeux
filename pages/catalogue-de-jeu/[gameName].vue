@@ -2,16 +2,20 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useGamesStore } from '@/stores/useGamesStore';
+import { useUserGamesStore } from '@/stores/useUserGamesStore'
 import { useGameUtils } from '@/composables/useGameUtils';
 import type { Game } from '@/types/Game';
+import PlatformSelectModal from '@/components/Games/PlatformSelectModal.vue';
 
 const gamesStore = useGamesStore();
+const userGamesStore = useUserGamesStore();
 const { getCoverUrl, getArtworkUrl, getScreenshotUrl, formatReleaseDate, formatRating } = useGameUtils();
 
 const route = useRoute();
 const router = useRouter();
 
 const game = ref<Game | null>(null);
+const showPlatformModal = ref(false);
 
 onMounted(async () => {
   const gameName = route.params.gameName as string;
@@ -23,13 +27,17 @@ onMounted(async () => {
   }
 });
 
-const goBack = () => {
-  router.back();
-};
+const addToUserList = () => {
+  if( game.value !== null && game.value.platforms && game.value.platforms.length > 0) {
+    showPlatformModal.value = true
+  } 
+}
 
-const addToWishlist = () => {
-  console.log("Ajouté à la Wishlist");
-};
+const handlePlatformSelect = (platformId:number) => {
+  if(game.value) {
+    userGamesStore.addGame(game.value, platformId)
+  }
+}
 
 const markAsFinished = () => {
   console.log("Jeu marqué comme terminé");
@@ -50,7 +58,7 @@ const markAsFinished = () => {
 
   </div>
   <div class="action-buttons">
-  <button class="btn primary" @click="addToWishlist">Ajouter à ma liste</button>
+  <button class="btn primary" @click="addToUserList">Ajouter à ma liste</button>
   <button class="btn secondary" @click="markAsFinished">Noter le jeu</button>
 </div>
 
@@ -64,6 +72,8 @@ const markAsFinished = () => {
     {{ game?.summary || "Pas de description disponible." }}
   </div>
 
+  <PlatformSelectModal v-if="showPlatformModal" :game="game" @close="showPlatformModal = false" @select="handlePlatformSelect" /> 
+  
   <div v-if="game?.screenshots?.length" class="extra-info">
     <h3>Captures d'écran</h3>
     <div class="screenshots">

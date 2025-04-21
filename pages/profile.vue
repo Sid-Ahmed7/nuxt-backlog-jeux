@@ -4,6 +4,12 @@ import { useRouter } from 'vue-router';
 import type { UserProfile } from '@/types/UserProfile';
 import ProfileHeader from '@/components/Profile/ProfileHeader.vue';
 import NavBar from '@/components/Profile/NavBar.vue';
+import UserGameCard from '@/components/Games/UserGameCard.vue';
+import { useUserGamesStore } from '@/stores/useUserGamesStore';
+
+
+const userGameStore = useUserGamesStore();
+const userProfile = ref<UserProfile | null>(null);
 
 const supabase = useSupabaseClient()
 const router = useRouter()
@@ -36,6 +42,15 @@ const { data: profile, error: profileError } = await supabase
 <div v-if="user" class="profile-container">
 <ProfileHeader :user="user"  />
 <NavBar />
+
+<div>
+        <UserGameCard
+            v-for="userGame in userGameStore.userGames"
+            :key="userGame.id"
+            :game="userGame"
+            :platform="userGame.platforms"
+            ></UserGameCard>
+    </div>
 </div>
 
 <div v-else class="loading">
