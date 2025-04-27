@@ -6,6 +6,8 @@ import { useUserGamesStore } from '@/stores/useUserGamesStore'
 import { useGameUtils } from '@/composables/useGameUtils';
 import type { Game } from '@/types/Game';
 import PlatformSelectModal from '@/components/Games/PlatformSelectModal.vue';
+import GameScreenshotLightbox from '@/components/Games/GameScreenshotLightbox.vue';
+
 
 const gamesStore = useGamesStore();
 const userGamesStore = useUserGamesStore();
@@ -16,6 +18,8 @@ const router = useRouter();
 
 const game = ref<Game | null>(null);
 const showPlatformModal = ref(false);
+const showLightbox = ref(false)
+const currentIndex = ref(0)
 
 onMounted(async () => {
   const gameName = route.params.gameName as string;
@@ -42,6 +46,30 @@ const handlePlatformSelect = (platformId:number) => {
 const markAsFinished = () => {
   console.log("Jeu marqué comme terminé");
 };
+
+const changeMainImage = (index: number) =>{
+  currentIndex.value = index
+}
+
+const navigateScreenshot = (d: number) => {
+  if (!game.value?.screenshots?.length) {return}
+
+  let newIndex = currentIndex.value + d
+
+  if (newIndex < 0) {
+    newIndex = game.value.screenshots.length -1
+  } else if (newIndex >= game.value.screenshots.length) {
+    newIndex = 0
+  }
+}
+
+const openLightbox = () => {
+  showLightbox.value = true
+}
+
+const closeLightBox =() => {
+  showLightbox.value = false
+}
 </script>
 
 <template>
@@ -55,12 +83,12 @@ const markAsFinished = () => {
         <span v-for="theme in game?.themes || []" :key="theme.id">{{ theme.name }}</span>
       </div>
     </div>
-
   </div>
+
   <div class="action-buttons">
-  <button class="btn primary" @click="addToUserList">Ajouter à ma liste</button>
-  <button class="btn secondary" @click="markAsFinished">Noter le jeu</button>
-</div>
+    <button class="btn primary" @click="addToUserList">Ajouter à ma liste</button>
+    <button class="btn secondary" @click="markAsFinished">Noter le jeu</button>
+  </div>
 
   <div class="info-grid">
     <div class="info-card">Sortie : {{ formatReleaseDate(game?.first_release_date) }}</div>
@@ -72,74 +100,146 @@ const markAsFinished = () => {
     {{ game?.summary || "Pas de description disponible." }}
   </div>
 
-  <PlatformSelectModal v-if="showPlatformModal" :game="game" @close="showPlatformModal = false" @select="handlePlatformSelect" /> 
+  <PlatformSelectModal 
+    v-if="showPlatformModal" 
+    :game="game" 
+    @close="showPlatformModal = false" 
+    @select="handlePlatformSelect" 
+  /> 
   
-  <div v-if="game?.screenshots?.length" class="extra-info">
-    <h3>Captures d'écran</h3>
-    <div class="screenshots">
-      <img v-for="screenshot in game.screenshots" :key="screenshot.id" :src="getScreenshotUrl(screenshot.image_id)" alt="Screenshot" class="screenshot" />
+  <div v-if="game?.screenshots?.length" class="extra-info screenshots-section">
+    <h3>Captures d'écran de {{ game.name }}</h3>
+    
+    <div class="screenshots-wrapper">
+      <div class="main-screenshot" @dblclick="openLightbox">
+        <img 
+          :src="getScreenshotUrl(game.screenshots[currentIndex]?.image_id)" 
+          alt="Screenshot principal"
+        >
+        
+        <div class="navigation-arrows">
+          <div class="arrow" @click.stop="navigateScreenshot(-1)">&#10094;</div>
+          <div class="arrow" @click.stop="navigateScreenshot(1)">&#10095;</div>
+        </div>
+      </div>
+      
+      <div class="thumbnails-row">
+        <div 
+          v-for="(screenshot, index) in game.screenshots" 
+          :key="screenshot.id"
+          :class="['thumbnail', { active: currentIndex === index }]" 
+          @click="changeMainImage(index)"
+        >
+          <img :src="getScreenshotUrl(screenshot.image_id)" :alt="`Screenshot ${index + 1}`">
+          <div class="hover-highlight"></div>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <GameScreenshotLightbox 
+    v-if="game?.screenshots"
+    :show="showLightbox"
+    :screenshots="game.screenshots"
+    :initial-index="currentIndex"
+    @close="closeLightBox"
+    @change-index="changeMainImage"
+  />
+  <div v-if="game?.expanded_games?.length" class="extra-info expanded-games">
+    <h3>Extensions du jeu</h3>
+    <ul>
+      <li v-for="expanded in game.expanded_games" :key="expanded.id">
+        <NuxtLink :to="`/catalogue-de-jeu/${encodeURIComponent(game?.name || 'Jeu inconnu')}`">
+        <img :src="getCoverUrl(expanded.cover?.image_id)" alt="extensions" class="expanded-cover" />
+      </NuxtLink>
+        <span>{{ expanded.name }}</span>
+      </li>
+    </ul>
+  </div>
+  
+  <div v-if="game?.dlcs?.length" class="extra-info dlcs">
+    <h3>DLCs</h3>
+    <ul>
+      <li v-for="dlc in game.dlcs" :key="dlc.id">
+        <NuxtLink :to="`/catalogue-de-jeu/${encodeURIComponent(game?.name || 'Jeu inconnu')}`">
+        <img :src="getCoverUrl(dlc.cover?.image_id)" alt="DLC" class="dlc-cover" />
+      </NuxtLink>
+        <span>{{ dlc.name }}</span>
+      </li>
+    </ul>
+  </div>
+  
+  <div v-if="game?.similar_games?.length" class="extra-info similar-games">
+    <h3>Jeux similaires</h3>
+    <ul>
+      <li v-for="similar in game.similar_games" :key="similar.id">
+        <NuxtLink :to="`/catalogue-de-jeu/${encodeURIComponent(game?.name || 'Jeu inconnu')}`">
+        <img :src="getCoverUrl(similar.cover?.image_id)" alt="jeux similaires" class="similar-cover" />
+      </NuxtLink>
+        <span>{{ similar.name }}</span>
+      </li>
+    </ul>
   </div>
 
 
 </template>
 
 <style scoped>
-
 .game-header {
   background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9));
-  padding: 60px 30px;
+  padding: 3.75rem 1.875rem;
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 2.5rem;
   background-size: cover;
   background-position: center;
   position: relative;
 }
 
 .game-header img {
-  height: 220px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  height: 13.75rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 0.625rem rgba(0,0,0,0.6);
   z-index: 2; 
 }
 
 .game-info h1 {
   font-size: 2.8rem;
-  margin-bottom: 10px;
+  margin-bottom: 0.625rem;
 }
 
 .badges span {
   display: inline-block;
   background: linear-gradient(135deg, #6a1b9a, #8e24aa);
-  box-shadow: 0 0 8px #8e24aa88;
-  border-radius: 50px;
-  padding: 5px 15px;
-  margin-right: 10px;
+  box-shadow: 0 0 0.5rem #8e24aa88;
+  border-radius: 3.125rem;
+  padding: 0.3125rem 0.9375rem;
+  margin-right: 0.625rem;
   font-size: 0.85rem;
   font-weight: bold;
+  color: white;
 }
 
 .info-grid {
   display: flex;
-  gap: 20px;
-  padding: 20px 30px;
+  gap: 1.25rem;
+  padding: 1.25rem 1.875rem;
   flex-wrap: wrap;
 }
+
 .action-buttons {
   display: flex;
-  gap: 20px;
-  padding: 20px 30px;
+  gap: 1.25rem;
+  padding: 1.25rem 1.875rem;
   flex-wrap: wrap;
 }
 
 .btn {
-  padding: 12px 20px;
+  padding: 0.75rem 1.25rem;
   font-size: 1rem;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   cursor: pointer;
   font-weight: bold;
-
 }
 
 .btn.primary {
@@ -154,7 +254,7 @@ const markAsFinished = () => {
 
 .btn.secondary {
   background-color: transparent;
-  border: 2px solid #8e24aa;
+  border: 0.125rem solid #8e24aa;
   color: #8e24aa;
 }
 
@@ -162,69 +262,200 @@ const markAsFinished = () => {
   background-color: #8e24aa;
   color: white;
 }
-
-
 .info-card {
   background-color: #2c2c2c;
-  padding: 15px 20px;
-  border-radius: 12px;
+  padding: 0.9375rem 1.25rem;
+  border-radius: 0.75rem;
   font-weight: 500;
-  flex: 1 1 180px;
+  flex: 1 1 11.25rem;
+  color: white;
 }
 
 .game-description {
   background: #141414;
-  border-left: 5px solid #8e24aa;
-  padding: 25px 30px;
+  border-left: 0.3125rem solid #8e24aa;
+  padding: 1.5625rem 1.875rem;
   font-style: italic;
   line-height: 1.6;
-  margin: 20px 30px;
-}
-
-.community-stats {
-  padding: 20px 30px;
-  font-weight: bold;
-}
-
-.circle-rating {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: conic-gradient(#6a1b9a 0% 92%, #333 92% 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  font-weight: bold;
-  margin: 0 auto;
+  margin: 1.25rem 1.875rem;
   color: white;
 }
 
-.rating-box {
-  text-align: center;
-  padding: 20px;
-}
-
 .extra-info {
-  padding: 20px 30px;
-  margin-bottom: 20px;
+  padding: 1.25rem 1.875rem;
+  margin-bottom: 1.25rem;
+}
+.extra-info {
+  margin: 30px 0;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.screenshots img,
-.artworks img,
-.dlc-cover {
-  max-width: 160px;
-  border-radius: 10px;
-  margin: 10px;
-  box-shadow: 0 0 6px rgba(0,0,0,0.4);
+.extra-info h3 {
+  margin-bottom: 15px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  border-bottom: 2px solid #8e24aa;
+  padding-bottom: 8px;
 }
 
-.dlc-entry,
-.similar-entry {
-  display: inline-block;
+.extra-info ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.extra-info li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.extra-info li:hover {
+  transform: translateY(-5px);
+}
+
+.expanded-cover,
+.dlc-cover,
+.similar-cover {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 8px;
+}
+
+.extra-info span {
   text-align: center;
-  margin: 10px;
-  max-width: 180px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #8e24aa;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.screenshots-section {
+  max-width: 58.75rem;
+  margin: 1.875rem auto;
+}
+
+.screenshots-section h3 {
   color: #fff;
+  padding-bottom: 0.625rem;
+  border-bottom: 0.0625rem solid #8e24aa;
+  margin-bottom: 1.25rem;
+}
+
+.screenshots-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.main-screenshot {
+  position: relative;
+  width: 100%;
+  height: 21.125rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0.9375rem rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.main-screenshot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnails-row {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.625rem;
+}
+
+.thumbnail {
+  flex: 0 0 auto;
+  width: 7.25rem;
+  height: 4.0625rem;
+  border-radius: 0.1875rem;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease;
+  border: 0.0625rem solid transparent;
+}
+
+.thumbnail.active {
+  border: 0.0625rem solid #8e24aa;
+  box-shadow: 0 0 0.3125rem rgba(142, 36, 170, 0.6);
+}
+
+.thumbnail:hover {
+  transform: translateY(-0.125rem);
+}
+
+.thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.125rem;
+}
+
+.hover-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(142, 36, 170, 0.2);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.thumbnail:hover .hover-highlight {
+  opacity: 1;
+}
+
+.navigation-arrows {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.arrow {
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  pointer-events: auto;
+  color: #fff;
+  font-size: 1.5rem;
+  margin: 0 0.625rem;
+  transition: background-color 0.2s;
+}
+
+.arrow:hover {
+  background-color: rgba(142, 36, 170, 0.7);
 }
 </style>

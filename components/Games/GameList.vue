@@ -3,13 +3,13 @@ import { computed } from 'vue'
 import type { Game } from '@/types/Game'
 import { useGameUtils } from '@/composables/useGameUtils'
 
+const { getCoverUrl } = useGameUtils()
+
 const props = defineProps<{
   games: Game[]
   colums?: number
   error?: string | null
 }>()
-
-const { getCoverUrl } = useGameUtils()
 
 const gridColumns = computed(() => {
   return props.colums ? props.colums : 8
