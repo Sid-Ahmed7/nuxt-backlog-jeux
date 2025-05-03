@@ -8,14 +8,11 @@ import UserGameCard from '@/components/Games/UserGameCard.vue';
 import { useUserGamesStore } from '@/stores/useUserGamesStore';
 
 
-const userGameStore = useUserGamesStore();
-const userProfile = ref<UserProfile | null>(null);
-
-const supabase = useSupabaseClient()
 const router = useRouter()
-
+const supabase = useSupabaseClient()
+const userGameStore = useUserGamesStore();
 const user = ref<UserProfile |  null>(null)
-
+const activeTab = ref<'all' | 'finished' | 'inProgress'>('all')
 
 const { data, error } = await supabase.auth.getUser()
 if( error || !data.user) {
@@ -40,17 +37,27 @@ const { data: profile, error: profileError } = await supabase
   } else {
       router.push('/login')
     }
+
+const filteredUserGame = computed(() => {
+  if (activeTab.value == 'finished') {
+    return userGameStore.userGames.filter(game => game.isFinished)
+  } else if (activeTab.value == 'inProgress') {
+    return userGameStore.userGames.filter(game => !game.isFinished)
+  }
+  return userGameStore.userGames
+
+})
 </script>
 
 <template>
 
 <div v-if="user" class="profile-container">
 <ProfileHeader :user="user"  />
-<NavBar />
+<NavBar :selectTab="activeTab" @update:tab="activeTab = $event" />
 
 <div>
         <UserGameCard
-            v-for="userGame in userGameStore.userGames"
+            v-for="userGame in filteredUserGame"
             :key="userGame.id"
             :game="userGame"
             ></UserGameCard>

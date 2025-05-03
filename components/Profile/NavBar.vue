@@ -1,15 +1,33 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+
+const props = defineProps<{
+  selectTab: 'all' | 'finished' | 'inProgress'
+}>()
+
+const emit = defineEmits()
+
+const setTab =(tab: 'all' | 'finished' | 'inProgress') => {
+  emit('update:tab', tab)
+}
+
+</script>
+
 <template>
+
 <nav class="navbar">
-      <ul>
-        <li><RouterLink to="/">Mes jeux</RouterLink></li>
-        <li><RouterLink to="/">Statistiques</RouterLink></li>
-      </ul>
+  <ul>
+      <li :class="{ active: props.selectTab === 'all' }" @click="setTab('all')">Tous les jeux</li>
+      <li :class="{ active: props.selectTab === 'finished' }" @click="setTab('finished')">Terminés</li>
+      <li :class="{ active: props.selectTab === 'inProgress' }" @click="setTab('inProgress')">En cours</li>
+    </ul>
     </nav>
 </template>
 
 <style scoped>
-
+.navbar {
+  margin-top: 4rem;
+  margin-bottom: 5rem;
+}
 
 .navbar ul {
   display: flex;
@@ -20,14 +38,14 @@
   padding: 0;
   margin: 0;
 }
-.navbar a {
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-}
 
-.navbar a:hover {
-  color: #007bff;
+.navbar li {
+  cursor: pointer;
+  font-weight: 500;
+  color: white;
+  background-color: var(--main-color);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
 }
 
 </style>
