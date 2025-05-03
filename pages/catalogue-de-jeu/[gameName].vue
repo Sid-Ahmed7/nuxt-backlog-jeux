@@ -27,6 +27,12 @@ const addToUserList = () => {
   } 
 }
 
+const removeFromUserList = () => {
+  
+  if(game.value && game.value.id) {
+    userGamesStore.removeGameInUserList(game.value.id)
+  }
+}
 
 
 const handlePlatformSelect = (platformName:string) => {
@@ -35,9 +41,9 @@ const handlePlatformSelect = (platformName:string) => {
   }
 }
 
-const markAsFinished = () => {
-  console.log("Jeu marqué comme terminé");
-};
+const isGameIsAdd = computed(() => {
+  return userGamesStore.userGames.some(g => g.id === game.value?.id)
+})
 
 const changeMainImage = (index: number) =>{
   currentIndex.value = index
@@ -90,8 +96,8 @@ onMounted(async () => {
   </div>
 
   <div class="action-buttons">
-    <button class="btn primary" @click="addToUserList">Ajouter à ma liste</button>
-    <button class="btn secondary" @click="markAsFinished">Noter le jeu</button>
+    <button class="btn primary" v-if="!isGameIsAdd" @click="addToUserList">Ajouter à ma liste</button>
+    <button class="btn primary" v-else @click="removeFromUserList">Retirer de ma liste</button>
   </div>
 
   <div class="info-grid">

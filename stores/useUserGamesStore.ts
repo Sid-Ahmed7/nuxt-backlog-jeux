@@ -22,20 +22,25 @@ export const useUserGamesStore = defineStore('userGames', () => {
                 try {
                     const gamesList = await $fetch(`/api/game/${game.id_game}`)
                     const gameData = gamesList[0]
+                    console.log('Game Data',gameData)
+
                     return {
                         id:game.id_game,
                         name: gameData.name,
                         cover: gameData.cover ? {id: gameData.cover.id, image_id: gameData.cover.image_id} : undefined,
                         isFinished: game.isFinished,
-                        platforms: gameData.platforms || [{name: game.platform_name}]
+                        platform_choose: gameData.platforms || [{name: game.platform_name}],
+                        timeSpent: game.timeSpent,
+
                     }
+
                 } catch (err) {
                     return
                 }
             })
         )
         userGames.value = gamesFromIgdb.filter(g => g !== undefined)
-        
+        console.log(userGames.value)
     }
 
     const addGameInUserList = async (game:Game, platformName: string) => {

@@ -1,13 +1,15 @@
+
 <script setup lang="ts">
 
-
+import type { Game } from '@/types/Game';
 const props = defineProps<{
     showModal: boolean;
+    game: Game & { isFinished: boolean; timeSpent?: number };
 }>()
 
 const emit = defineEmits()
 
-const timeSpent = ref('')
+const selectTimeSpent = ref(props.game.timeSpent?.toString() ?? '')
 const isSubmitting = ref(false)
 
 const closeModal = () => {
@@ -15,12 +17,14 @@ const closeModal = () => {
 }
 
 const handleSubmit = () => {
-    if (!timeSpent.value || isSubmitting.value) {
+  const time = parseInt(selectTimeSpent.value)
+
+    if (isNaN(time)|| isSubmitting.value) {
         return
     }
 
     isSubmitting.value = true
-    emit('submit', parseInt(timeSpent.value))
+    emit('submit', time)
 }
 
 </script>
@@ -33,7 +37,7 @@ const handleSubmit = () => {
         <div class="input-container">
             <input
             type="number"
-            v-model="timeSpent"
+            v-model="selectTimeSpent"
             placeholder="Entrez le nombre d'heures sur le jeu"
             />
         </div>

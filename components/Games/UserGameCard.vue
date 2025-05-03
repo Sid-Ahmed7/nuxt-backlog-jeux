@@ -8,7 +8,7 @@ const {getCoverUrl} = useGameUtils()
 const userGamesStore  = useUserGamesStore();
 
 const props = defineProps<{
-  game: Game & { isFinished: boolean}
+  game: Game & { isFinished: boolean; timeSpent?: number }
 }>();
 
 const showModal = ref(false)
@@ -56,22 +56,19 @@ const toogleFinished = () => {
       <h2>{{ game.name }}</h2>
 
       <div class="platforms">
-        <span
-          v-for="platform in game.platforms"
-          :key="platform.id"
-          class="badge"
-        >
-          {{ platform.name || 'Platform ID: ' + platform.id }}
+        <span class="badge">
+          {{ game.platform_choose ? game?.platform_choose[0]?.name : 'Plateforme inconnue' }}
         </span>
       </div>
 
       <div class="status">
         <span>Status : {{ game.isFinished ? '✅ Terminé' : '🕹️ En cours' }}</span>
+        <span>Temps passé : {{ game.timeSpent !== undefined ? game.timeSpent + ' h' : 'Non renseigné' }}</span>
       </div>
 
       <div class="actions">
         <button @click="toogleFinished()" :class="{ 'completed-btn': game.isFinished }">
-          {{ game.isFinished ? 'Marquer comme non terminé' : 'Marquer comme terminé' }}
+          {{ game.isFinished ? 'Marquer comme en cours' : 'Marquer comme terminé' }}
         </button>
         <button @click="handleRemove" class="remove-btn">
           Supprimer
@@ -94,10 +91,9 @@ const toogleFinished = () => {
   align-items: center;
   gap: 1rem;
   margin-bottom: 1.5rem;
-  border: 0.0625rem solid #ddd;
   border-radius: 0.75rem;
   padding: 1rem;
-  background-color: #fff;
+  background-color: #2c2c2c;
   transition: box-shadow 0.2s ease;
 }
 
@@ -120,7 +116,7 @@ const toogleFinished = () => {
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: var(--main-color);
 }
 
 .platforms .badge {
@@ -136,7 +132,9 @@ const toogleFinished = () => {
 .status {
   margin-top: 0.5rem;
   font-weight: bold;
-  color: #4a5568;
+  color: var(--main-color);
+  display: flex;
+  gap: 2rem;
 }
 
 .actions {
@@ -151,7 +149,7 @@ const toogleFinished = () => {
   border-radius: 0.375rem;
   cursor: pointer;
   font-size: 0.875rem;
-  background-color: #3b82f6;
+  background-color: var(--main-color);
   color: white;
   transition: background-color 0.2s ease;
 }
@@ -161,7 +159,7 @@ const toogleFinished = () => {
 }
 
 .actions button.completed-btn {
-  background-color: #6b7280;
+  background-color: var(--main-color);
 }
 
 .remove-btn {
