@@ -2,6 +2,7 @@
 import { useGameUtils } from '@/composables/useGameUtils';
 import { useUserGamesStore } from '@/stores/useUserGamesStore';
 import type { Game } from '@/types/Game';
+import TimeModal from '@/components/Games/TimeModal.vue';
 
 const {getCoverUrl} = useGameUtils()
 const userGamesStore  = useUserGamesStore();
@@ -9,6 +10,21 @@ const userGamesStore  = useUserGamesStore();
 const props = defineProps<{
   game: Game & { isFinished: boolean}
 }>();
+
+const showModal = ref(false)
+const isSubmitting = ref(false)
+
+
+const handleSubmitTimeGame = async (time:number) => {
+  isSubmitting.value = true
+  if(props.game.id) {
+    await userGamesStore.updateGameTime(props.game?.id, time)
+    await userGamesStore.toggleFinished(props.game.id)
+    showModal.value = false
+  }
+  isSubmitting.value = false
+
+}
 
 const handleRemove = () => {
 
@@ -19,8 +35,9 @@ const handleRemove = () => {
 }
 
 const toogleFinished = () => {
-  if(props.game.id) {
-    userGamesStore.toggleFinished(props.game.id)
+
+  if(!props.game.isFinished && props.game.id) {
+    showModal.value = true
   }
 }
 
@@ -61,6 +78,13 @@ const toogleFinished = () => {
         </button>
       </div>
     </div>
+    <TimeModal
+    v-if="showModal"
+    :showModal="showModal"
+    :game="game"
+    @submit="handleSubmitTimeGame"
+    @close="showModal = false"
+    ></TimeModal>
   </div>
 </template>
 
@@ -145,7 +169,6 @@ const toogleFinished = () => {
   color: white;
 }
 
-/* Responsive adjustments */
 @media (max-width: 40rem) {
   .user-game-card {
     flex-direction: column;

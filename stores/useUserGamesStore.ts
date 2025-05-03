@@ -4,7 +4,7 @@ import type { Game } from '@/types/Game'
 
 
 export const useUserGamesStore = defineStore('userGames', () => {
-    const userGames = ref<(Game & { isFinished: boolean })[]>([])
+    const userGames = ref<(Game & { isFinished: boolean; timeSpent?: number })[]>([])
     const supabase = useSupabaseClient()
 
     const fetchUserGames = async (userId :string) => {
@@ -88,11 +88,11 @@ export const useUserGamesStore = defineStore('userGames', () => {
         const game = userGames.value.find(g => g.id === gameId)
         if (!game) { return }
 
-        const isGameFinished = !game.isFinished
+        game.isFinished = true
 
         const {error} = await supabase
         .from('games')
-        .update({isFinished: isGameFinished})
+        .update({isFinished: true})
         .eq('user_id', user.id)
         .eq('id_game', gameId)
 
@@ -100,10 +100,33 @@ export const useUserGamesStore = defineStore('userGames', () => {
             return
         }
 
-        game.isFinished = isGameFinished
+    }
+
+    const updateGameTime = async(gameId: number, timeSpent: number) => {
+        const { data: {user} } = await supabase.auth.getUser()
+        if(!user) {
+            return
+        }
+        const {error} = await supabase
+        .from('games')
+        .update({timeSpent})
+        .eq('user_id', user.id)
+        .eq('id_game', gameId)
+
+        if(error) {
+            console.log(error)
+            return
+        }
+
+        const game = userGames.value.find(g => g.id === gameId)
+        if(game) {
+            game.timeSpent = timeSpent
+        }
+
+
     }
 
 
 
-    return { userGames, addGameInUserList, removeGameInUserList, toggleFinished,fetchUserGames}
+    return { userGames, addGameInUserList, removeGameInUserList, toggleFinished,fetchUserGames, updateGameTime}
 })  
