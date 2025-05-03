@@ -13,9 +13,13 @@ const props = defineProps<{
 const selectedPlatformId = ref<number | null>(null)
 
 const handleSubmit = () => {
-    if(selectedPlatformId.value !== null) {
-        emit('select', selectedPlatformId.value)
-        emit('close')
+    if (selectedPlatformId.value !== null && props.game?.platforms) {
+        const selectedPlatform = props.game.platforms.find(platform => platform.id === selectedPlatformId.value)
+        
+        if (selectedPlatform) {
+            emit('select', selectedPlatform.name)
+            emit('close')
+        }
     }
 }
 </script>

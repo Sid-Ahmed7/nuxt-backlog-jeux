@@ -32,7 +32,12 @@ const { data: profile, error: profileError } = await supabase
     user.value = {
       ...data.user,
       ...profile,
-    } } else {
+    }
+    
+    await userGameStore.fetchUserGames(user.value.id); 
+    console.log(userGameStore.fetchUserGames(user.value.id))
+  
+  } else {
       router.push('/login')
     }
 </script>
@@ -48,7 +53,6 @@ const { data: profile, error: profileError } = await supabase
             v-for="userGame in userGameStore.userGames"
             :key="userGame.id"
             :game="userGame"
-            :platform="userGame.platforms"
             ></UserGameCard>
     </div>
 </div>

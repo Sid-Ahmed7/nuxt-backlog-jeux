@@ -21,25 +21,17 @@ const showPlatformModal = ref(false);
 const showLightbox = ref(false)
 const currentIndex = ref(0)
 
-onMounted(async () => {
-  const gameName = route.params.gameName as string;
-  const fetchedGame = gamesStore.games.find((game) => game.name === gameName);
-  if (fetchedGame) {
-    game.value = fetchedGame;
-  } else {
-    router.push('/404');
-  }
-});
-
 const addToUserList = () => {
   if( game.value !== null && game.value.platforms && game.value.platforms.length > 0) {
     showPlatformModal.value = true
   } 
 }
 
-const handlePlatformSelect = (platformId:number) => {
+
+
+const handlePlatformSelect = (platformName:string) => {
   if(game.value) {
-    userGamesStore.addGame(game.value, platformId)
+    userGamesStore.addGameInUserList(game.value, platformName)
   }
 }
 
@@ -70,6 +62,18 @@ const openLightbox = () => {
 const closeLightBox =() => {
   showLightbox.value = false
 }
+
+
+onMounted(async () => {
+  const gameName = route.params.gameName as string;
+  const fetchedGame = gamesStore.games.find((game) => game.name === gameName);
+  if (fetchedGame) {
+    game.value = fetchedGame;
+  } else {
+    router.push('/404');
+  }
+});
+
 </script>
 
 <template>
@@ -173,7 +177,7 @@ const closeLightBox =() => {
     <h3>Jeux similaires</h3>
     <ul>
       <li v-for="similar in game.similar_games" :key="similar.id">
-        <NuxtLink :to="`/catalogue-de-jeu/${encodeURIComponent(game?.name || 'Jeu inconnu')}`">
+        <NuxtLink :to="`/catalogue-de-jeu/${encodeURIComponent(similar?.name || 'Jeu inconnu')}`">
         <img :src="getCoverUrl(similar.cover?.image_id)" alt="jeux similaires" class="similar-cover" />
       </NuxtLink>
         <span>{{ similar.name }}</span>
