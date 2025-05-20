@@ -161,7 +161,7 @@ onMounted(async () => {
     <h3>Extensions du jeu</h3>
     <ul>
       <li v-for="expanded in game.expanded_games" :key="expanded.id">
-        <NuxtLink :to="`/catalogue-de-jeu/${encodeURIComponent(game?.name || 'Jeu inconnu')}`">
+        <NuxtLink :to="`/catalogue-de-jeu/${game?.name || 'Jeu inconnu'}`">
         <img :src="getCoverUrl(expanded.cover?.image_id)" alt="extensions" class="expanded-cover" />
       </NuxtLink>
         <span>{{ expanded.name }}</span>
@@ -173,7 +173,7 @@ onMounted(async () => {
     <h3>DLCs</h3>
     <ul>
       <li v-for="dlc in game.dlcs" :key="dlc.id">
-        <NuxtLink :to="`/catalogue-de-jeu/${encodeURIComponent(game?.name || 'Jeu inconnu')}`">
+        <NuxtLink :to="`/catalogue-de-jeu/${game?.name || 'Jeu inconnu'}`">
         <img :src="getCoverUrl(dlc.cover?.image_id)" alt="DLC" class="dlc-cover" />
       </NuxtLink>
         <span>{{ dlc.name }}</span>
@@ -185,7 +185,7 @@ onMounted(async () => {
     <h3>Jeux similaires</h3>
     <ul>
       <li v-for="similar in game.similar_games" :key="similar.id">
-        <NuxtLink :to="`/catalogue-de-jeu/${encodeURIComponent(similar?.name || 'Jeu inconnu')}`">
+        <NuxtLink :to="`/catalogue-de-jeu/${similar?.name || 'Jeu inconnu'}`">
         <img :src="getCoverUrl(similar.cover?.image_id)" alt="jeux similaires" class="similar-cover" />
       </NuxtLink>
         <span>{{ similar.name }}</span>
