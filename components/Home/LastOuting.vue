@@ -9,10 +9,6 @@ import '@/assets/styles/games-recommendations.css'
 const gamesStore = useGamesStore()
 const {getCoverUrl, formatReleaseDate} = useGameUtils()
 
-onMounted(async () => {
-  await gamesStore.fetchGames()
-})
-
 const lastOutingGames = computed(() => {
   const lastOuting = gamesStore.games.filter((game) => {
     const releaseDate = game.first_release_date
@@ -26,6 +22,10 @@ const lastOutingGames = computed(() => {
       return secondReleaseDate - firstReleaseDate
     })
     .slice(0, 5)
+})
+
+onMounted(async () => {
+  await gamesStore.fetchGames()
 })
 
 

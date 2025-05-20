@@ -7,7 +7,7 @@ import { useGameUtils } from '@/composables/useGameUtils';
 import type { Game } from '@/types/Game';
 import PlatformSelectModal from '@/components/Games/PlatformSelectModal.vue';
 import GameScreenshotLightbox from '@/components/Games/GameScreenshotLightbox.vue';
-
+import GameComments from '@/components/Games/GameComments.vue';
 
 const gamesStore = useGamesStore();
 const userGamesStore = useUserGamesStore();
@@ -155,6 +155,8 @@ onMounted(async () => {
     @close="closeLightBox"
     @change-index="changeMainImage"
   />
+  <GameComments :gameId="game?.id" />
+
   <div v-if="game?.expanded_games?.length" class="extra-info expanded-games">
     <h3>Extensions du jeu</h3>
     <ul>
