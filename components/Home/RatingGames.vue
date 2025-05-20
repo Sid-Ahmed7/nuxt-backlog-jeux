@@ -8,10 +8,6 @@ import '@/assets/styles/games-recommendations.css'
 const gamesStore = useGamesStore()
 const { getCoverUrl, formatRating } = useGameUtils()
 
-onMounted(async () => {
-  await gamesStore.fetchGames()
-})
-
 const topRatedGames = computed(() => {
   if (!Array.isArray(gamesStore.games)) {
     return [] 
@@ -28,6 +24,9 @@ const topRatedGames = computed(() => {
     .slice(0, 5)
 })
 
+onMounted(async () => {
+  await gamesStore.fetchGames()
+})
 
 
 </script>

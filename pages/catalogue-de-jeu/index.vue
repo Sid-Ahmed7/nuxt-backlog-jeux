@@ -29,14 +29,7 @@ const error = ref<string | null>(null)
 const currentPage = ref(1)
 const gamesPerPage = 100
 
-onMounted(async () => {
-  await gamesStore.fetchGames()
-  await platformsStore.fetchPlatforms()
-  await genresStore.fetchGenres()
-  await themesStore.fetchThemes()
-  await gameModesStore.fetchGamesModes()
-  console.log('Games:', gamesStore.games)
-})
+
 const onSearch = (query: string) => {
   searchQuery.value = query.toLowerCase()
 }
@@ -83,7 +76,14 @@ const totalPages = computed(() => {
   return Math.ceil(filters.value.length / gamesPerPage)
 })
 
-
+onMounted(async () => {
+  await gamesStore.fetchGames()
+  await platformsStore.fetchPlatforms()
+  await genresStore.fetchGenres()
+  await themesStore.fetchThemes()
+  await gameModesStore.fetchGamesModes()
+  console.log('Games:', gamesStore.games)
+})
 </script>
 
 <template>
