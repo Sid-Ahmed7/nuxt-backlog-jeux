@@ -21,7 +21,8 @@ defineProps<{
       <div class="user-status">
         <h1>{{ user.username }}</h1>
         <span class="status"></span>
-        <button class="edit-btn">Éditer profil</button>
+
+        <NuxtLink :to="`/edit-profile/${user.id}`" class="edit-btn">Éditer profil</NuxtLink>
       </div>
       <div class="user-bio">
         <p>{{ user.bio || '' }}</p>
@@ -97,15 +98,12 @@ height: 35vh;
   padding: 0.4rem 1rem;
   font-size: 1rem;
   border-radius: 0.5rem;
-  background-color: #007bff;
+  background-color: var(--main-color);
   color: white;
   border: none;
   cursor: pointer;
 }
 
-.edit-btn:hover {
-  background-color: #0056b3;
-}
 
 .user-bio p {
   margin: 0;

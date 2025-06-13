@@ -7,7 +7,7 @@ import { useThemeStore } from '@/stores/useThemeStore'
 import { useGamesModesStore } from '@/stores/useGamesModesStore'
 import GamesList from '@/components/Games/GameList.vue'
 import GameFilters from '@/components/Games/GameFilters.vue'
-import SearchBar from '@/components/Games/SearchBar.vue'
+import SearchBar from '~/components/SearchBar.vue'
 import Pagination from '@/components/Pagination.vue'
 
 
@@ -21,20 +21,19 @@ const selectedGenres = ref<string[]>([])
 const selectedPlatforms = ref<string[]>([])
 const selectedGameModes = ref<string[]>([])
 const selectedThemes = ref<string[]>([])
-// const selectedRating = ref<[number, number]>([1, 10])
 const searchQuery = ref<string>('')
 const showFilters = ref(false)
 const error = ref<string | null>(null)
 
 const currentPage = ref(1)
-const gamesPerPage = 100
+const gamesPerPage = 50
 
 
 const onSearch = (query: string) => {
   searchQuery.value = query.toLowerCase()
 }
 
-const filters = computed(() => {
+const filteredGames = computed(() => {
   return gamesStore.games.filter((game) => {
     const matchesSearch = game.name?.toLowerCase().includes(searchQuery.value.toLowerCase())
 
@@ -63,18 +62,31 @@ const filters = computed(() => {
 })
 
 const noResults = computed (() => {
-  return filters.value.length === 0 
+  return filteredGames.value.length === 0 
 })
 
 const paginatedGames = computed(() => {
   const start = (currentPage.value - 1) * gamesPerPage
   const end = start + gamesPerPage
-  return filters.value.slice(start, end)
+  return filteredGames.value.slice(start, end)
 })
 
 const totalPages = computed(() => {
-  return Math.ceil(filters.value.length / gamesPerPage)
+  return Math.ceil(filteredGames.value.length / gamesPerPage)
 })
+
+
+watch(showFilters, (open) => {
+    document.body.style.overflow =  open ? 'hidden' : ''
+})
+
+watch([filteredGames, currentPage], () => {
+  const maxPage = Math.ceil(filteredGames.value.length / gamesPerPage)
+    if( currentPage.value > maxPage) {
+      currentPage.value = maxPage || 1
+    }
+  })
+
 
 onMounted(async () => {
   await gamesStore.fetchGames()
@@ -88,15 +100,21 @@ onMounted(async () => {
 
 <template>
   <div class="catalogue-view">
-    <h1 class="catalogue-title">Catalogue des jeux</h1>
-    <div class="search-bar">
-      <SearchBar @search="onSearch" />
+   <div class= "header"> 
+      <h1 class="catalogue-title">Catalogue des jeux</h1>
+          <div class="search-bar">
+            <SearchBar @search="onSearch" />
+          </div>
     </div>
-    <button class="toggle-filters" @click="showFilters = !showFilters">
-      {{ showFilters ? 'Masquer les filtres' : 'Afficher les filtres' }}
+
+    <button class="toggle-filters"  @click="showFilters = !showFilters">
+          {{ showFilters ? 'Masquer les filtres' : 'Afficher les filtres' }}
     </button>
-    <div class="content" :class="{ 'filters-open': showFilters }">
-      <div v-if="showFilters" class="filters">
+
+    <div v-if="showFilters" class="overlay" @click="showFilters = false"></div>
+    
+    <div class="content">
+      <div class="filters" :class="{ 'filters-visible': showFilters }">
         <GameFilters
           :platforms="platformsStore.platforms"
           :genres="genresStore.genres"
@@ -113,9 +131,9 @@ onMounted(async () => {
 
       <div v-else-if="noResults" class="no-results">
         <h2>Aucun résultat trouvé</h2>
-        </div>
-      <section class="games-section" v-else>
-        <GamesList :games="paginatedGames" :colums="showFilters ? 5 : 8" :error="error" />
+      </div>
+      <section v-else class="games-section" >
+        <GamesList :games="paginatedGames" :error="error" />
         <div class="pagination">
       <Pagination :currentPage="currentPage" :totalPages="totalPages" @update:currentPage="currentPage = $event" />
     </div>
@@ -128,6 +146,8 @@ onMounted(async () => {
 <style scoped>
 .catalogue-view {
   padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -145,23 +165,9 @@ onMounted(async () => {
 .search-bar {
   display: flex;
   justify-content: center;
-  align-items: center;
   gap: 2.5rem;
   margin-bottom: 2rem;
   width: 100%;
-}
-
-.content {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  gap: 4rem;
-  width: 100%;
-  max-width: 100%;
-}
-
-.filters {
-  max-width: 20%;
 }
 
 .toggle-filters {
@@ -173,16 +179,68 @@ onMounted(async () => {
   cursor: pointer;
   border-radius: 0.5rem;
   margin-bottom: 2rem;
+  z-index: 500;
 }
+
+.content {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  gap: 2rem;
+  position: relative;
+}
+
+.filters {
+  background-color: #2d3a3f;
+  padding: 2rem;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 300px;
+  transform: translateX(-120%);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  z-index: 1001;
+}
+
+.filters-visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.games-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.games-section {
+  width: 100%;
+}
+
 .no-results {
   text-align: center;
   font-size: 1.5rem;
   color: var(--color-primary);
   margin-top: 2rem;
   width: 100%;
-  padding: 1.25rem;
-
 }
+
 .pagination {
   display: flex;
   justify-content: center;
@@ -208,3 +266,4 @@ onMounted(async () => {
   cursor: not-allowed;
 }
 </style>
+

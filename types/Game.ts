@@ -34,16 +34,15 @@ export interface Game {
       id: number
       name: string
     }[]
-    release_dates?: {
-      date: number
-    }
+
     first_release_date?: number
     involved_companies?: {
       company: {
         id: number
         name: string
       }
-    }
+    
+    }[]
     total_rating_count?: number
     year?: number
     dlcs? : {
@@ -62,6 +61,14 @@ export interface Game {
         image_id: string
       }
     }[]
+    expansions?: {
+      id: number
+      name: string
+      cover?: {
+        id: number
+        image_id: string
+      }
+    }[]
     similar_games?: {
       id: number
       name: string
@@ -69,6 +76,23 @@ export interface Game {
         id: number
         image_id: string
       }
+    }[]
+    multiplayer_modes?: {
+      id:number
+      campaigncoop?: boolean
+      dropin?: boolean
+      lancoop?: boolean
+      offlinecoop?: boolean
+      offlinecoopmax?: number
+      offlinemax?: number
+      onlinemax?: number
+      splitscreen?: boolean
+      splitsscreenonline?: boolean
+    }[]
+    videos?: {
+      id: number
+      name:string,
+      video_id: string
     }[]
 
 

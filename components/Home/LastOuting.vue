@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useGamesStore } from '@/stores/useGamesStore'
-import { useGameUtils } from '@/composables/useGameUtils'
+import { useGameUtils } from '~/utils/useGameUtils'
 import defaultCover from '@/assets/images/default_cover.png'
 import '@/assets/styles/games-recommendations.css'
 

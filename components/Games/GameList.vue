@@ -1,27 +1,23 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Game } from '@/types/Game'
-import { useGameUtils } from '@/composables/useGameUtils'
+import { useGameUtils } from '~/utils/useGameUtils'
+import defaultCover from '@/assets/images/default_cover.png'
+
 
 const { getCoverUrl } = useGameUtils()
 
 const props = defineProps<{
   games: Game[]
-  colums?: number
   error?: string | null
 }>()
-
-const gridColumns = computed(() => {
-  return props.colums ? props.colums : 8
-})
-
 </script>
 
 <template>
   <div class="game-list">
     <div v-if="error" class="error">{{ error }}</div>
     <div v-else>
-      <ul :style="{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)` }">
+      <ul>
         <li v-for="game in games" :key="game.id">
           
           <NuxtLink :to="`/catalogue-de-jeu/${game?.name || 'Jeu inconnu'}`">
@@ -29,7 +25,12 @@ const gridColumns = computed(() => {
               <img
                 v-if="game.cover"
                 :src="getCoverUrl(game.cover?.image_id)"
-                alt="Couverture du jeu"
+                :alt="`Couverture du jeu ${game.name}`"
+              />
+              <img
+                v-else
+                :src="defaultCover"
+                :alt="`Couverture du jeu ${game.name}`"
               />
               <div class="game-name">
                 <h2>{{ game.name }}</h2>
@@ -48,6 +49,7 @@ const gridColumns = computed(() => {
 }
 ul {
   display: grid;
+grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 1rem;
   padding: 0;
   list-style: none;
@@ -63,7 +65,7 @@ li {
 .cover-image {
   position: relative;
   width: 100%;
-  height: 40vh;
+  height: 200px;
   justify-content: center;
   align-items: center;
   display: flex;
@@ -81,6 +83,7 @@ img {
   background: rgba(0, 0, 0, 0.4);
   padding: 1rem;
   box-sizing: border-box;
+  color: white;
 }
 .game-name h2 {
   color: white;

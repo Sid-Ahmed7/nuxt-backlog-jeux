@@ -1,16 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-const props = defineProps({
-totalPages :{
-  type: Number,
-  required: true
-},
-currentPage :{
-  type: Number,
-  required: true
-}
-})
+const props = defineProps<{
+totalPages : number,
+currentPage: number
+}>()
 
 const emit = defineEmits()
 
@@ -61,5 +55,13 @@ button {
   padding: 1rem;
   font-size: 1rem;
   cursor: pointer;
+}
+
+button:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+.active {
+  background: #388e3c;
 }
 </style>

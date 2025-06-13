@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useGameUtils } from '@/composables/useGameUtils';
+import { useGameUtils } from '~/utils/useGameUtils';
 import { useUserGamesStore } from '@/stores/useUserGamesStore';
 import type { Game } from '@/types/Game';
 import TimeModal from '@/components/Games/TimeModal.vue';

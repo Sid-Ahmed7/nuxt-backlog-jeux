@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useGameUtils } from '@/composables/useGameUtils';
+import { useGameUtils } from '~/utils/useGameUtils';
 import type { Game } from '@/types/Game';
 
 const {getScreenshotUrl} = useGameUtils();

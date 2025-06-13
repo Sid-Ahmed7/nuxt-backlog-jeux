@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useGamesStore } from '@/stores/useGamesStore'
-import { useGameUtils } from '@/composables/useGameUtils'
+import { useGameUtils } from '~/utils/useGameUtils'
 import '@/assets/styles/games-recommendations.css'
 
 

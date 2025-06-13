@@ -13,7 +13,33 @@ export default defineEventHandler(async (event) => {
                 Authorization: `Bearer ${config.api.accessToken}`,
                 'Content-Type': 'application/json',
             },
-            body: `fields name,summary,cover.image_id,artworks.image_id,screenshots.image_id,dlcs,expanded_games,similar_games.name,similar_games.cover.image_id,first_release_date,franchise,genres.name,involved_companies.company.name,platforms.name,platforms.platform_logo.image_id,total_rating_count,release_dates, game_modes.name, themes.name;limit ${limit}; offset ${offset}; where category = (0, 8, 9);`,
+body: `fields 
+  name,
+  summary,
+  age_ratings.rating,
+  cover.image_id,
+  artworks.image_id,
+  screenshots.image_id,
+  dlcs,
+  expanded_games,
+  expansions.name,
+  expansions.cover.image_id,
+  similar_games.name,
+  similar_games.cover.image_id,
+  first_release_date,
+  franchise,
+  genres.name,
+  involved_companies.company.name,
+  platforms.name,
+  platforms.platform_logo.image_id,
+  total_rating_count,
+  game_modes.name,
+  themes.name,
+  videos.video_id,
+  videos.name; 
+limit ${limit}; 
+offset ${offset}; 
+where game_type = (0, 8, 9);`
         })
     })
     const responses = await Promise.all(requests)

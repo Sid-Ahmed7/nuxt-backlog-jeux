@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useGamesStore } from '@/stores/useGamesStore';
 import { useUserGamesStore } from '@/stores/useUserGamesStore'
-import { useGameUtils } from '@/composables/useGameUtils';
+import { useGameUtils } from '~/utils/useGameUtils';
 import type { Game } from '@/types/Game';
 import PlatformSelectModal from '@/components/Games/PlatformSelectModal.vue';
 import GameScreenshotLightbox from '@/components/Games/GameScreenshotLightbox.vue';
@@ -59,6 +59,7 @@ const navigateScreenshot = (d: number) => {
   } else if (newIndex >= game.value.screenshots.length) {
     newIndex = 0
   }
+  currentIndex.value = newIndex
 }
 
 const openLightbox = () => {
@@ -185,7 +186,8 @@ onMounted(async () => {
     <h3>Jeux similaires</h3>
     <ul>
       <li v-for="similar in game.similar_games" :key="similar.id">
-        <NuxtLink :to="`/catalogue-de-jeu/${similar?.name || 'Jeu inconnu'}`">
+   <NuxtLink :to="`/catalogue-de-jeu/${encodeURIComponent(similar?.name || 'Jeu inconnu')}`">
+
         <img :src="getCoverUrl(similar.cover?.image_id)" alt="jeux similaires" class="similar-cover" />
       </NuxtLink>
         <span>{{ similar.name }}</span>

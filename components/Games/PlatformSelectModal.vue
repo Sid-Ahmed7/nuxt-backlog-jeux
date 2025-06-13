@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Game } from '@/types/Game'
-import { useGameUtils } from '@/composables/useGameUtils'
+import { useGameUtils } from '~/utils/useGameUtils'
 
 
 const { getLogoUrl } = useGameUtils()
