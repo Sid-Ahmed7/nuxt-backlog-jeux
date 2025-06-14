@@ -32,7 +32,7 @@
           échangez des conseils, créez des liens et trouvez de nouvelles pépites à ajouter à votre
           backlog.
         </p>
-        <NuxtLink class="link-button" to="/inscription">Rejoindre la communauté</NuxtLink>
+        <NuxtLink class="link-button" to="/signup">Rejoindre la communauté</NuxtLink>
       </div>
     </section>
 </template>

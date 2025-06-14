@@ -3,19 +3,30 @@ import type { UserProfile } from '@/types/UserProfile'
 import defaultAvatar from '@/assets/images/spidey.jpg'
 import defaultBanner from '@/assets/images/default_banner.png'
 
-defineProps<{
+const props = defineProps<{
   user: UserProfile
 }>()
+
+const avatarUrl = computed(() => {
+  return props.user.avatarUrl || defaultAvatar
+})
+const bannerUrl = computed(() => {
+  return props.user.bannerUrl || defaultBanner
+})
+
+const bio = computed(() => {
+  return props.user.bio || ''
+})
 </script>
 
 <template>
   <div class="profile-header">
     <div class="banner">
 
-        <img :src="user.bannerUrl || defaultBanner" alt="Banner" class="banner-image" />
+        <img :src="bannerUrl" alt="Banner" class="banner-image" />
     </div>
     <div class="avatar">
-      <img :src="user.avatarUrl || defaultAvatar" alt="Avatar" class="avatar-image" />
+      <img :src="avatarUrl" alt="Avatar" class="avatar-image" />
     </div>
     <div class="user-details">
       <div class="user-status">
@@ -25,7 +36,7 @@ defineProps<{
         <NuxtLink :to="`/edit-profile/${user.id}`" class="edit-btn">Éditer profil</NuxtLink>
       </div>
       <div class="user-bio">
-        <p>{{ user.bio || '' }}</p>
+        <p>{{ bio }}</p>
       </div>
     </div>
   </div>

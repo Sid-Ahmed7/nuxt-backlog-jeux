@@ -30,32 +30,27 @@ async function signUp() {
   }
 
   isSubmitting.value = true
+  errorMessage.value = ''
 
   try {
     const { data, error } = await supabase.auth.signUp({
       email: email.value,
       password: password.value,
+      options: {
+        data: {
+          username: username.value
+        }
+      }
     })
 
     if (error) {
       errorMessage.value = error.message
       isSubmitting.value = false
-    } else {
-      if (!data.user) {
-        throw new Error('Aucune donnée de l\'utilisateur');
-      }
-      const {error } = await supabase
-      .from('user_profiles')
-      .insert([
-        {
-          user_id: data.user.id,
-          username: username.value
-        },
-      ])
-
+      return
+    } 
 
       router.push('/login')
-    }
+    
   } catch (error) {
     errorMessage.value = 'Une erreur est survenue. Veuillez réessayer.'
     isSubmitting.value = false

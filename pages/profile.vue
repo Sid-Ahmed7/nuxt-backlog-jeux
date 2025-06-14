@@ -11,32 +11,27 @@ import { useUserGamesStore } from '@/stores/useUserGamesStore';
 const router = useRouter()
 const supabase = useSupabaseClient()
 const userGameStore = useUserGamesStore();
-const user = ref<UserProfile |  null>(null)
+const user = useSupabaseUser()
 const activeTab = ref<'all' | 'finished' | 'inProgress'>('all')
 
-const { data, error } = await supabase.auth.getUser()
-if( error || !data.user) {
- router.push('/login')
-} 
+if (!user.value) {
+  router.push('/login')
+}
 
-const { data: profile, error: profileError } = await supabase
+const { data: res, error } = await useAsyncData('profile',  async () => supabase
   .from('user_profiles')
   .select('*')
-  .eq('user_id', data.user?.id || '')
-  .single<UserProfile>()
+  .eq('user_id', user.value!.id || '')
+  .maybeSingle())
 
-  if(profile) {
-    user.value = {
-      ...data.user,
-      ...profile,
-    }
-    
-    await userGameStore.fetchUserGames(user.value.id); 
-    console.log(userGameStore.fetchUserGames(user.value.id))
-  
-  } else {
+   if(res.value) {
+        await userGameStore.fetchUserGames(user.value!.id); 
+        console.log(userGameStore.fetchUserGames(user.value!.id))
+   } else {
       router.push('/login')
     }
+    const profile = computed(() => res.value?.data ?? null)
+
 
 const filteredUserGame = computed(() => {
   if (activeTab.value == 'finished') {
@@ -51,8 +46,9 @@ const filteredUserGame = computed(() => {
 
 <template>
 
-<div v-if="user" class="profile-container">
-<ProfileHeader :user="user"  />
+<div v-if="profile" class="profile-container">
+<ProfileHeader  :user="profile" />
+
 <NavBar :selectTab="activeTab" @update:tab="activeTab = $event" />
 
 <div>

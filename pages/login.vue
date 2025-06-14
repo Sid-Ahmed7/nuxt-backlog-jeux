@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router';
 
 const supabase = useSupabaseClient()
 
-
 const email = ref('');
 const password = ref('');
 const errorMessage = ref('');
@@ -17,23 +16,51 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    const {  error } = await supabase.auth.signInWithPassword({
+    const {  data, error } = await supabase.auth.signInWithPassword({
       email: email.value,
       password: password.value,
     });
 
     if (error) {
       errorMessage.value = error.message;
-    } else {
-      router.push('/');
+    } 
+
+    const user = data?.user;
+    if (!user) {
+      throw new Error('Utilisateur non trouvé');
     }
+
+    const { data: profile, error: profileError} = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+
+
+      if(!profile) {
+        const username = user.user_metadata?.username || 'Utilisateur'
+        const { error: insertError } = await supabase
+        .from('user_profiles')
+        .insert([
+          {
+            user_id: user.id,
+            username:username 
+          }
+        ])
+
+ 
+      }
+    
+      router.push('/');
+
   } catch (err) {
-    errorMessage.value = 'Une erreur est survenue. Veuillez réessayer.';
+    errorMessage.value = 'Une erreur s\'est produite lors de la connexion.';
   } finally {
     isSubmitting.value = false;
   }
-};
-</script>
+}
+
+  </script>
 
 <template>
   <div class="container">
