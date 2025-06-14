@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import type { UserProfile } from '@/types/UserProfile';
 import ProfileHeader from '@/components/Profile/ProfileHeader.vue';
-import NavBar from '@/components/Profile/NavBar.vue';
+import ProfileNavBar from '@/components/Profile/ProfileNavbar.vue';
+import GameInProgress from '~/components/Chart/GameStatus.vue';
+import GameByPlatform from '@/components/Chart/GameByPlatform.vue';
+import GameSpentTime from '@/components/Chart/GameSpentTime.vue';
+import SubNavBar from '~/components/Profile/SubNavBar.vue';
 import UserGameCard from '@/components/Games/UserGameCard.vue';
 import { useUserGamesStore } from '@/stores/useUserGamesStore';
 
@@ -12,7 +15,10 @@ const router = useRouter()
 const supabase = useSupabaseClient()
 const userGameStore = useUserGamesStore();
 const user = useSupabaseUser()
-const activeTab = ref<'all' | 'finished' | 'inProgress'>('all')
+const activeTab = ref<'all' | 'stats'>('all')
+const subFilter = ref<'all' | 'finished' | 'inProgress'>('all')
+
+
 
 if (!user.value) {
   router.push('/login')
@@ -30,13 +36,14 @@ const { data: res, error } = await useAsyncData('profile',  async () => supabase
    } else {
       router.push('/login')
     }
-    const profile = computed(() => res.value?.data ?? null)
 
+
+const profile = computed(() => res.value?.data ?? null)
 
 const filteredUserGame = computed(() => {
-  if (activeTab.value == 'finished') {
+  if (subFilter.value == 'finished') {
     return userGameStore.userGames.filter(game => game.isFinished)
-  } else if (activeTab.value == 'inProgress') {
+  } else if (subFilter.value == 'inProgress') {
     return userGameStore.userGames.filter(game => !game.isFinished)
   }
   return userGameStore.userGames
@@ -46,18 +53,32 @@ const filteredUserGame = computed(() => {
 
 <template>
 
-<div v-if="profile" class="profile-container">
-<ProfileHeader  :user="profile" />
-
-<NavBar :selectTab="activeTab" @update:tab="activeTab = $event" />
-
-<div>
+ <div v-if="profile" class="profile-container">
+    
+  <ProfileHeader  :user="profile" />
+  <ProfileNavBar :selectTab="activeTab" @update:tab="activeTab = $event" />
+  
+  <div v-if="activeTab === 'all'" class="sub-navbar">
+    <SubNavBar :selectTab="activeTab" @update:tab="activeTab = $event" />
+    
+    <div>
         <UserGameCard
             v-for="userGame in filteredUserGame"
             :key="userGame.game.id"
             :games="userGame"
             ></UserGameCard>
     </div>
+    </div>
+
+    <div v-else-if ="activeTab === 'stats'">
+      <GameInProgress :games="userGameStore.userGames" />
+      <GameByPlatform :games="userGameStore.userGames" />
+      <GameSpentTime :games="userGameStore.userGames" />
+
+
+
+    </div>
+
 </div>
 
 <div v-else class="loading">
@@ -68,7 +89,9 @@ const filteredUserGame = computed(() => {
 <style scoped>
 
 
-
+.sub-navbar {
+  margin-top: 2rem;
+}
 .loading {
   text-align: center;
   margin-top: 50px;
