@@ -54,8 +54,8 @@ const filteredUserGame = computed(() => {
 <div>
         <UserGameCard
             v-for="userGame in filteredUserGame"
-            :key="userGame.id"
-            :game="userGame"
+            :key="userGame.game.id"
+            :games="userGame"
             ></UserGameCard>
     </div>
 </div>

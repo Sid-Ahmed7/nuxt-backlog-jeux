@@ -95,6 +95,7 @@ height: 35vh;
 .user-status h1 {
   font-size: 1.75rem;
   margin: 0;
+  color: var(--main-color);
 }
 
 .status {

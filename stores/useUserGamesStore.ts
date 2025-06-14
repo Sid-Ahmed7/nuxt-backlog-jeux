@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 import type { Game } from '@/types/Game'
+import type { UserGame } from '~/types/UserGame'
 
 
 
 export const useUserGamesStore = defineStore('userGames', () => {
-    const userGames = ref<(Game & { isFinished: boolean; timeSpent?: number })[]>([])
+    const userGames = ref<UserGame[]>([])
     const supabase = useSupabaseClient()
 
     const fetchUserGames = async (userId :string) => {
@@ -18,21 +19,22 @@ export const useUserGamesStore = defineStore('userGames', () => {
         }
 
         const gamesFromIgdb = await Promise.all(
-            data.map(async (game) => {
+            data.map(async (game: any ) => {
                 try {
-                    const gamesList = await $fetch(`/api/game/${game.id_game}`)
+                    const gamesList = await $fetch<Game[]>(`/api/game/${game.id_game}`)
                     const gameData = gamesList[0]
                     console.log('Game Data',gameData)
 
                     return {
-                        id:game.id_game,
-                        name: gameData.name,
-                        cover: gameData.cover ? {id: gameData.cover.id, image_id: gameData.cover.image_id} : undefined,
+                         game: {
+                            id: game.id_game,
+                            name: gameData.name,
+                            cover: gameData.cover ? { id: gameData.cover.id, image_id: gameData.cover.image_id } : undefined,
+                        },
                         isFinished: game.isFinished,
-                        platform_choose: gameData.platforms || [{name: game.platform_name}],
+                        platform_choose: game.platform_choose || game.platform_name,  // string ici
                         timeSpent: game.timeSpent,
-
-                    }
+                    } as UserGame
 
                 } catch (err) {
                     return
@@ -44,10 +46,7 @@ export const useUserGamesStore = defineStore('userGames', () => {
     }
 
     const addGameInUserList = async (game:Game, platformName: string) => {
-        const platform = game.platforms?.find(p => p.name === platformName)
-        
-        if(!platform) {return}
-
+ 
         const {data : {user}} = await supabase.auth.getUser()
         if(!user) {
             return
@@ -64,10 +63,10 @@ export const useUserGamesStore = defineStore('userGames', () => {
 
 
             userGames.value.push({
-                id : game.id,
-                cover: game.cover ? { id: game.cover.id, image_id: game.cover.image_id } : undefined,
-                platforms: [platform],
+                game,
                 isFinished:false,
+                platform_choose: platformName,
+                timeSpent: 0
             })
         
     }
@@ -80,7 +79,7 @@ export const useUserGamesStore = defineStore('userGames', () => {
 
         const {error} = await supabase.from('games').delete().eq('user_id', user.id).eq('id_game', gameId)
         
-        userGames.value = userGames.value.filter(g => g.id !== gameId)
+        userGames.value = userGames.value.filter(g => g.game.id !== gameId)
     }
 
     const toggleFinished = async (gameId : number) => {
@@ -90,14 +89,14 @@ export const useUserGamesStore = defineStore('userGames', () => {
           return
         }
 
-        const game = userGames.value.find(g => g.id === gameId)
+        const game = userGames.value.find(g => g.game.id === gameId)
         if (!game) { return }
 
-        game.isFinished = true
+        game.isFinished = !game.isFinished
 
         const {error} = await supabase
         .from('games')
-        .update({isFinished: true})
+        .update({isFinished:  game.isFinished})
         .eq('user_id', user.id)
         .eq('id_game', gameId)
 
@@ -123,7 +122,7 @@ export const useUserGamesStore = defineStore('userGames', () => {
             return
         }
 
-        const game = userGames.value.find(g => g.id === gameId)
+        const game = userGames.value.find(g => g.game.id === gameId)
         if(game) {
             game.timeSpent = timeSpent
         }

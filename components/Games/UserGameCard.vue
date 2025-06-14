@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { useGameUtils } from '~/utils/useGameUtils';
 import { useUserGamesStore } from '@/stores/useUserGamesStore';
-import type { Game } from '@/types/Game';
+import type { UserGame } from '@/types/UserGame';
 import TimeModal from '@/components/Games/TimeModal.vue';
 
 const {getCoverUrl} = useGameUtils()
 const userGamesStore  = useUserGamesStore();
 
 const props = defineProps<{
-  game: Game & { isFinished: boolean; timeSpent?: number }
+  games: UserGame
 }>();
 
 const showModal = ref(false)
@@ -17,9 +17,9 @@ const isSubmitting = ref(false)
 
 const handleSubmitTimeGame = async (time:number) => {
   isSubmitting.value = true
-  if(props.game.id) {
-    await userGamesStore.updateGameTime(props.game?.id, time)
-    await userGamesStore.toggleFinished(props.game.id)
+  if(props.games.game.id) {
+    await userGamesStore.updateGameTime(props.games.game?.id, time)
+    await userGamesStore.toggleFinished(props.games.game.id)
     showModal.value = false
   }
   isSubmitting.value = false
@@ -28,16 +28,18 @@ const handleSubmitTimeGame = async (time:number) => {
 
 const handleRemove = () => {
 
-  if(props.game.id) {
-    userGamesStore.removeGameInUserList(props.game.id)
+  if(props.games.game.id) {
+    userGamesStore.removeGameInUserList(props.games.game.id)
   }
   
 }
 
-const toogleFinished = () => {
+const toggleFinished = () => {
 
-  if(!props.game.isFinished && props.game.id) {
+  if(!props.games.isFinished && props.games.game.id) {
     showModal.value = true
+  } else if (props.games.isFinished && props.games.game.id) {
+    userGamesStore.toggleFinished(props.games.game.id)
   }
 }
 
@@ -46,29 +48,29 @@ const toogleFinished = () => {
 <template>
   <div class="user-game-card">
     <img
-      v-if="game.cover?.image_id"
-      :src="getCoverUrl(game.cover.image_id)"
+      v-if="games.game.cover?.image_id"
+      :src="getCoverUrl(games.game.cover.image_id)"
       alt="Cover"
       class="cover"
     />
 
     <div class="game-info">
-      <h2>{{ game.name }}</h2>
+      <h2>{{ games.game.name }}</h2>
 
       <div class="platforms">
-        <span class="badge">
-          {{ game.platform_choose ? game?.platform_choose[0]?.name : 'Plateforme inconnue' }}
+        <span class="platform">
+          {{ games.platform_choose ? games?.platform_choose : 'Plateforme inconnue' }}
         </span>
       </div>
 
-      <div class="status">
-        <span>Status : {{ game.isFinished ? '✅ Terminé' : '🕹️ En cours' }}</span>
-        <span>Temps passé : {{ game.timeSpent !== undefined ? game.timeSpent + ' h' : 'Non renseigné' }}</span>
+      <div class="status-time">
+        <span class="status">Status : {{ games.isFinished ? '✅ Terminé' : '🕹️ En cours' }}</span>
+        <span class="time">Temps passé : {{ games.timeSpent !== undefined ? games.timeSpent + ' h' : 'Non renseigné' }}</span>
       </div>
 
       <div class="actions">
-        <button @click="toogleFinished()" :class="{ 'completed-btn': game.isFinished }">
-          {{ game.isFinished ? 'Marquer comme en cours' : 'Marquer comme terminé' }}
+        <button @click="toggleFinished" :class="{ 'completed-btn': games.isFinished }">
+          {{ games.isFinished ? 'Marquer comme en cours' : 'Marquer comme terminé' }}
         </button>
         <button @click="handleRemove" class="remove-btn">
           Supprimer
@@ -78,7 +80,7 @@ const toogleFinished = () => {
     <TimeModal
     v-if="showModal"
     :showModal="showModal"
-    :game="game"
+    :game="games"
     @submit="handleSubmitTimeGame"
     @close="showModal = false"
     ></TimeModal>
@@ -88,101 +90,108 @@ const toogleFinished = () => {
 <style scoped>
 .user-game-card {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  background-color: #2c2c2c;
-  transition: box-shadow 0.2s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 450px;
+  margin: 1rem auto;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.user-game-card:hover {
-  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
-}
+
 
 .cover {
-  width: 6.25rem;
+  width: 150px;
   height: auto;
-  border-radius: 0.5rem;
   object-fit: cover;
+  border-radius: 16px 0 0 16px;
 }
 
 .game-info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
   flex: 1;
 }
 
 .game-info h2 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem 0;
-  color: var(--main-color);
+  margin: 0;
+  font-size: 1.25rem;
+  color: #00ffcc;
+  text-shadow: 0 0 5px #00ffcc;
 }
 
-.platforms .badge {
-  background-color: #eee;
-  border-radius: 0.375rem;
-  padding: 0.2rem 0.5rem;
-  margin-right: 0.5rem;
-  font-size: 0.875rem;
+.platform {
+  background: rgba(0, 255, 204, 0.2);
+  border: 1px solid #00ffcc;
+  color: #00ffcc;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 0.75rem;
   display: inline-block;
-  margin-bottom: 0.25rem;
 }
 
-.status {
-  margin-top: 0.5rem;
-  font-weight: bold;
-  color: var(--main-color);
+.status-time {
+  font-size: 0.875rem;
+  color: #ddd;
   display: flex;
-  gap: 2rem;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .actions {
-  margin-top: 1rem;
   display: flex;
-  gap: 1rem;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .actions button {
-  padding: 0.4rem 0.8rem;
+  padding: 6px 12px;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 5px;
   cursor: pointer;
-  font-size: 0.875rem;
-  background-color: var(--main-color);
-  color: white;
-  transition: background-color 0.2s ease;
+  font-size: 0.8rem;
+  background: transparent;
+  color: #fff;
+  border: 1px solid;
 }
 
-.actions button:hover {
-  opacity: 0.9;
+.actions .finish {
+  border-color: #00ffcc;
 }
 
-.actions button.completed-btn {
-  background-color: var(--main-color);
+.actions .remove {
+  border-color: #ff4d4d;
 }
 
-.remove-btn {
-  background-color: #f87171 !important;
-  color: white;
+.actions .finish:hover {
+  background: #00ffcc;
+  color: #000;
+  box-shadow: 0 0 10px #00ffcc;
 }
 
-@media (max-width: 40rem) {
+.actions .remove:hover {
+  background: #ff4d4d;
+  color: #000;
+  box-shadow: 0 0 10px #ff4d4d;
+}
+
+@media (max-width: 600px) {
   .user-game-card {
     flex-direction: column;
-    align-items: flex-start;
+    width: 100%;
   }
-  
+
   .cover {
     width: 100%;
-    max-height: 12rem;
-    object-fit: contain;
-    margin-bottom: 1rem;
-  }
-  
-  .actions {
-    width: 100%;
-    flex-direction: column;
+    height: 200px;
+    border-radius: 16px 16px 0 0;
   }
 }
+
 </style>

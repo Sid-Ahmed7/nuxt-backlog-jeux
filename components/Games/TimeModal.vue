@@ -2,9 +2,10 @@
 <script setup lang="ts">
 
 import type { Game } from '@/types/Game';
+import type { UserGame } from '~/types/UserGame';
 const props = defineProps<{
     showModal: boolean;
-    game: Game & { isFinished: boolean; timeSpent?: number };
+    game: UserGame;
 }>()
 
 const emit = defineEmits()
@@ -31,7 +32,7 @@ const handleSubmit = () => {
 
 <template>
 
-<div v-if="showModal" class="modal-overlay">
+<div class="modal-overlay">
     <div class="modal">
         <h2>Veuillez indiquer le temps que vous avez passé sur le jeu</h2>
         <div class="input-container">
