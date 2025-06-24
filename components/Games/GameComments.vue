@@ -1,11 +1,12 @@
 <script setup lang="ts">
-
+import {useAuthStore} from '@/stores/useAuthStore'
 const props = defineProps<{
     gameId: number |undefined
 }>()
 
 const supabase = useSupabaseClient()
-const user = useSupabaseUser()
+const authStore = useAuthStore()
+const user = authStore.user
 
 const newComment = ref('')
 const comments = ref<Array<{id: string; userId: string; gameId: string; content: string; created_at: string}>>([]);
@@ -29,7 +30,7 @@ const fetchComments = async () => {
 };
 
 const submitComment = async () => {
-    if(!newComment.value.trim() || !user.value || !props.gameId) {
+    if(!newComment.value.trim() || !authStore.user || !props.gameId) {
         return
     }
 
@@ -37,7 +38,7 @@ const submitComment = async () => {
         .from('comments')
         .insert({
             content: newComment.value.trim(),
-            user_id: user.value.id,
+            user_id: authStore.user.id,
             game_id: props.gameId,
             parent_id: null
         });

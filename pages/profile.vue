@@ -9,30 +9,32 @@ import GameSpentTime from '@/components/Chart/GameSpentTime.vue';
 import SubNavBar from '~/components/Profile/SubNavBar.vue';
 import UserGameCard from '@/components/Games/UserGameCard.vue';
 import { useUserGamesStore } from '@/stores/useUserGamesStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 
 const router = useRouter()
 const supabase = useSupabaseClient()
 const userGameStore = useUserGamesStore();
-const user = useSupabaseUser()
+const authStore = useAuthStore()
+const user = authStore.user
 const activeTab = ref<'all' | 'stats'>('all')
 const subFilter = ref<'all' | 'finished' | 'inProgress'>('all')
 
 
 
-if (!user.value) {
+if (!user) {
   router.push('/login')
 }
 
 const { data: res, error } = await useAsyncData('profile',  async () => supabase
   .from('user_profiles')
   .select('*')
-  .eq('user_id', user.value!.id || '')
+  .eq('user_id', user?.id || '')
   .maybeSingle())
 
    if(res.value) {
-        await userGameStore.fetchUserGames(user.value!.id); 
-        console.log(userGameStore.fetchUserGames(user.value!.id))
+        await userGameStore.fetchUserGames(user!.id); 
+        console.log(userGameStore.fetchUserGames(user!.id))
    } else {
       router.push('/login')
     }

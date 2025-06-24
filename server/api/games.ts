@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
 
     const limit = 500
-    const nbGames = 5000
+    const nbGames = 1000
     const nbRequests = Math.ceil(nbGames / limit)
     const requests = Array.from({ length: nbRequests }, (_, i) => {
         const offset = i * limit

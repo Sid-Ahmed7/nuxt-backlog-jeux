@@ -1,63 +1,34 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import type { Database } from '../supabase'
+import { useAuthStore } from '@/stores/useAuthStore';
 
-const supabase = useSupabaseClient()
+const supabase = useSupabaseClient<Database>()
+const router = useRouter();
+const authStore = useAuthStore()
 
-const email = ref('');
-const password = ref('');
-const errorMessage = ref('');
 const isSubmitting = ref(false);
 
-const router = useRouter();
-
-const handleSubmit = async () => {
-  errorMessage.value = '';
+const handleSubmit = async ({email, password} : {email:string; password:string}) => {
   isSubmitting.value = true;
+  await authStore.login(email, password)
 
-  try {
+
     const {  data, error } = await supabase.auth.signInWithPassword({
-      email: email.value,
-      password: password.value,
+      email: email,
+      password: password,
     });
 
-    if (error) {
-      errorMessage.value = error.message;
-    } 
+  if (!authStore.error) {
+    router.push('/')
+  }
+  isSubmitting.value = false
 
-    const user = data?.user;
-    if (!user) {
-      throw new Error('Utilisateur non trouvé');
-    }
-
-    const { data: profile, error: profileError} = await supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('user_id', user.id)
-    .single();
-
-
-      if(!profile) {
-        const username = user.user_metadata?.username || 'Utilisateur'
-        const { error: insertError } = await supabase
-        .from('user_profiles')
-        .insert([
-          {
-            user_id: user.id,
-            username:username 
-          }
-        ])
 
  
-      }
     
-      router.push('/');
 
-  } catch (err) {
-    errorMessage.value = 'Une erreur s\'est produite lors de la connexion.';
-  } finally {
-    isSubmitting.value = false;
-  }
 }
 
   </script>
@@ -66,36 +37,11 @@ const handleSubmit = async () => {
   <div class="container">
     <div class="card">
       <h2>Se connecter</h2>
-      <form @submit.prevent="handleSubmit">
-
-        <div class="form-group">
-          <input
-            type="email"
-            id="email"
-            placeholder="Email"
-            v-model="email"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <input
-            type="password"
-            id="password"
-            placeholder="Mot de passe"
-            v-model="password"
-            required
-          />
-        </div>
-
-        <button type="submit" :disabled="isSubmitting">Se connecter</button>
-
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-
+      <LoginForm @submit="handleSubmit" />
+        <p v-if="authStore.error" class="error-message">{{ authStore.error }}</p>
         <p class="switch">
           Pas encore inscrit ? <NuxtLink to="/signup">S'inscrire</NuxtLink>
         </p>
-      </form>
     </div>
   </div>
 </template>
@@ -124,33 +70,7 @@ h2 {
   font-weight: 600;
 }
 
-.form-group {
-  margin-bottom: 20px;
-}
 
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  border: none;
-  color: white;
-  font-size: 16px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
 
 .error-message {
   color: red;

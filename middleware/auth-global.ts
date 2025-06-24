@@ -1,5 +1,9 @@
+import { useAuthStore } from "@/stores/useAuthStore";
+
 export default defineNuxtRouteMiddleware(async (to) => {
-  const user = useSupabaseUser();
+    const authStore = useAuthStore()
+
+  const user = authStore.user;
   const supabase = useSupabaseClient();
 
   await new Promise<void>((resolve) => {
@@ -19,13 +23,13 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return to.path === route;
   });
 
-  console.log('[Middleware] to.path:', to.path, '| isPublic:', isPublic, '| user:', user.value);
+  console.log('[Middleware] to.path:', to.path, '| isPublic:', isPublic, '| user:', authStore.user);
 
-  if (!isPublic && !user.value) {
+  if (!isPublic && !authStore.user) {
     return navigateTo('/login');
   }
 
-  if (user.value && to.path === '/login') {
+  if (authStore.user && to.path === '/login') {
     return navigateTo('/');
   }
 });

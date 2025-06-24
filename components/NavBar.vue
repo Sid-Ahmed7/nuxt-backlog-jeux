@@ -1,11 +1,22 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { Database } from '../supabase'
+import { useAuthStore } from '@/stores/useAuthStore'
 
+
+const authStore = useAuthStore()
+const router = useRouter()
 
 const isOpen = ref(false)
-const isLogin = useSupabaseUser()
+
+
 const toggleMenu = () => {
   isOpen.value = !isOpen.value
+}
+
+const logout = async () => {
+  await authStore.logout()
+  router.push('/login')
 }
 
 </script>
@@ -32,16 +43,16 @@ const toggleMenu = () => {
       <li>
         <NuxtLink to="/a-propos">À propos</NuxtLink>
       </li>
-      <li v-if="!isLogin">
+      <li v-if="!authStore.user">
         <NuxtLink to="/login">Connexion</NuxtLink>
       </li>
-      <li v-if="!isLogin">
+      <li v-if="!authStore.user">
         <NuxtLink to="/signup">Inscription</NuxtLink>
       </li>
-      <li v-if="isLogin">
+      <li v-if="authStore.user">
         <NuxtLink to="/profile">Profil</NuxtLink>
       </li>
-      <li v-if="isLogin">
+      <li v-if="authStore.user">
         <NuxtLink to="/logout">Déconnexion</NuxtLink>
       </li>
     </ul>
