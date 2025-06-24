@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import {useAuthStore} from '@/stores/useAuthStore'
+import  type { Database } from '@/supabase'
+
+
 const props = defineProps<{
     gameId: number |undefined
 }>()
 
-const supabase = useSupabaseClient()
+const supabase = useSupabaseClient<Database>()
 const authStore = useAuthStore()
 const user = authStore.user
 
@@ -22,8 +25,14 @@ const fetchComments = async () => {
         .eq('game_id', props.gameId)
         .order('created_at', { ascending: false });
 
-        if(!error) {
-            comments.value = data
+        if(!error && data) {
+            comments.value = data.map((comment) => ({
+                id: comment.id,
+                userId: comment.user_id ?? '',
+                gameId: comment.game_id.toString(),
+                content: comment.content ?? '',
+                created_at: comment.created_at
+            }))
         } else {
             return error
         }

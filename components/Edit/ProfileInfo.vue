@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import  type { Database } from '@/supabase'
 
 
-const supabase = useSupabaseClient()
+const supabase = useSupabaseClient<Database>()
 const router = useRouter()
 
 const email = ref<string>('')
@@ -42,7 +43,7 @@ const updateInfoUser = async () => {
           const { error } = await supabase
             .from('user_profiles')
             .update({ username: username.value, bio: bio.value } as any)
-            .eq('user_id', userId)
+            .eq('user_id', userId ?? "")
 
 
         if(error) {
@@ -65,8 +66,8 @@ onMounted(async () => {
   }
 
   const user = data.session.user
-  email.value = user.email
-  actualEmail.value = user.email
+  email.value = user.email ?? ""
+  actualEmail.value = user.email ?? ""
 
   const { data: userProfile, error: userProfileError } = await supabase
     .from('user_profiles')

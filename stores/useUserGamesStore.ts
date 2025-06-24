@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia'
 import type { Game } from '@/types/Game'
 import type { UserGame } from '~/types/UserGame'
+import  type { Database } from '@/supabase'
 
 
 
 export const useUserGamesStore = defineStore('userGames', () => {
     const userGames = ref<UserGame[]>([])
-    const supabase = useSupabaseClient()
+    const supabase = useSupabaseClient<Database>()
 
     const fetchUserGames = async (userId :string) => {
         const {data, error } = await supabase

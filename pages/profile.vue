@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import ProfileHeader from '@/components/Profile/ProfileHeader.vue';
-import ProfileNavBar from '@/components/Profile/ProfileNavbar.vue';
+import ProfileNavBar from '@/components/Profile/ProfileNavBar.vue';
 import GameInProgress from '~/components/Chart/GameStatus.vue';
 import GameByPlatform from '@/components/Chart/GameByPlatform.vue';
 import GameSpentTime from '@/components/Chart/GameSpentTime.vue';
