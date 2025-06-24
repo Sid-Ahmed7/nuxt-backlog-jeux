@@ -3,14 +3,16 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useGamesStore } from '@/stores/useGamesStore';
 import { useUserGamesStore } from '@/stores/useUserGamesStore'
+import { useAuthStore } from '@/stores/useAuthStore'
 import { useGameUtils } from '~/utils/useGameUtils';
 import type { Game } from '@/types/Game';
 import PlatformSelectModal from '@/components/Games/PlatformSelectModal.vue';
-import GameScreenshotLightbox from '@/components/Games/GameScreenshotLightbox.vue';
+import GameScreenshot from '@/components/Games/GameScreenshot.vue';
 import GameComments from '@/components/Games/GameComments.vue';
 
 const gamesStore = useGamesStore();
 const userGamesStore = useUserGamesStore();
+const authStore = useAuthStore()
 const { getCoverUrl, getArtworkUrl, getScreenshotUrl, formatReleaseDate, formatRating } = useGameUtils();
 
 const route = useRoute();
@@ -42,7 +44,9 @@ const handlePlatformSelect = (platformName:string) => {
 }
 
 const isGameIsAdd = computed(() => {
-  return userGamesStore.userGames.some(g => g.id === game.value?.id)
+  return userGamesStore.userGames.some((g) => g.game.id === game.value?.id)
+
+
 })
 
 const changeMainImage = (index: number) =>{
@@ -71,7 +75,7 @@ const closeLightBox =() => {
 }
 
 
-onMounted(async () => {
+onMounted( () => {
   const gameName = route.params.gameName as string;
   const fetchedGame = gamesStore.games.find((game) => game.name === gameName);
   if (fetchedGame) {
@@ -96,7 +100,7 @@ onMounted(async () => {
     </div>
   </div>
 
-  <div class="action-buttons">
+  <div v-if="authStore.user"  class="action-buttons">
     <button class="btn primary" v-if="!isGameIsAdd" @click="addToUserList">Ajouter à ma liste</button>
     <button class="btn primary" v-else @click="removeFromUserList">Retirer de ma liste</button>
   </div>
@@ -148,7 +152,7 @@ onMounted(async () => {
     </div>
   </div>
 
-  <GameScreenshotLightbox 
+  <GameScreenshot
     v-if="game?.screenshots"
     :show="showLightbox"
     :screenshots="game.screenshots"
