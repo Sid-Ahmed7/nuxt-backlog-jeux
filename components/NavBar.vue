@@ -53,7 +53,7 @@ const logout = async () => {
         <NuxtLink to="/profile">Profil</NuxtLink>
       </li>
       <li v-if="authStore.user">
-        <NuxtLink to="/logout">Déconnexion</NuxtLink>
+        <NuxtLink to="#" @click.prevent="authStore.logout">Déconnexion</NuxtLink>
       </li>
     </ul>
   </nav>
