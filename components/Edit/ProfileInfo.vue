@@ -106,34 +106,32 @@ onMounted(async () => {
 
 </script>
 <template>
-    <div class="max-w-md mx-auto mt-10 p-6 border rounded shadow">
-      <h2 class="text-2xl font-semibold mb-4">Modifier le profil</h2>
-  
-  
-      <form @submit.prevent="updateInfoUser" class="space-y-4">
-        <div>
+    <div class="form-container">
+
+      <form @submit.prevent="updateInfoUser" class="form">
+        <div class="form-group">
           <label class="block">Email</label>
           <input v-model="email" type="email" class="w-full border px-3 py-2 rounded" />
         </div>
   
-        <div>
+        <div class="form-group">
           <label class="block">Mot de passe (laisser vide si inchangé)</label>
           <input v-model="password" type="password" class="w-full border px-3 py-2 rounded" />
         </div>
   
-        <div>
+        <div class="form-group">
           <label class="block">Nom d'utilisateur</label>
           <input v-model="username" type="text" class="w-full border px-3 py-2 rounded" />
         </div>
   
-        <div>
+        <div class="form-group"> 
           <label class="block">Bio</label>
           <textarea v-model="bio" class="w-full border px-3 py-2 rounded" rows="3"></textarea>
         </div>
   
         <button
           type="submit"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          class="submit-btn"
           :disabled="isUpdate"
         >
           {{ isUpdate ? 'Mise à jour...' : 'Enregistrer les modifications' }}
@@ -141,3 +139,56 @@ onMounted(async () => {
       </form>
     </div>
   </template>
+
+
+  <style scoped>
+  .form-container {
+    max-width: 600px;
+    margin: 4rem auto;
+    padding: 2rem;
+    border-radius: 1rem;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-group {
+    display:flex;
+    flex-direction : column;
+  }
+
+  label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--main-color);
+  }
+
+  input,textarea {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .submit-btn {
+    background-color: var(--main-color);
+    color: #fff;
+    font-weight: 600;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+
+  .submit-btn:disabled {
+    cursor: not-allowed;
+  }
+
+
+
+
+
+
+  </style>

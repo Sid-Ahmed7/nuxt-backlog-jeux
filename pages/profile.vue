@@ -6,8 +6,8 @@ import ProfileNavBar from '@/components/Profile/ProfileNavBar.vue';
 import GameInProgress from '~/components/Chart/GameStatus.vue';
 import GameByPlatform from '@/components/Chart/GameByPlatform.vue';
 import GameSpentTime from '@/components/Chart/GameSpentTime.vue';
-import SubNavBar from '~/components/Profile/SubNavBar.vue';
 import UserGameCard from '@/components/Games/UserGameCard.vue';
+import Pagination from '@/components/Pagination.vue';
 import { useUserGamesStore } from '@/stores/useUserGamesStore';
 import { useAuthStore } from '@/stores/useAuthStore';
 
@@ -18,7 +18,8 @@ const userGameStore = useUserGamesStore();
 const authStore = useAuthStore()
 const user = authStore.user
 const activeTab = ref<'all' | 'stats'>('all')
-const subFilter = ref<'all' | 'finished' | 'inProgress'>('all')
+const currentPage = ref(1)
+const gamesPerPage = 6
 
 
 
@@ -42,15 +43,17 @@ const { data: res, error } = await useAsyncData('profile',  async () => supabase
 
 const profile = computed(() => res.value?.data ?? null)
 
-const filteredUserGame = computed(() => {
-  if (subFilter.value == 'finished') {
-    return userGameStore.userGames.filter(game => game.isFinished)
-  } else if (subFilter.value == 'inProgress') {
-    return userGameStore.userGames.filter(game => !game.isFinished)
-  }
-  return userGameStore.userGames
-
+const paginatedGames = computed(() => {
+  const start = (currentPage.value - 1) * gamesPerPage
+  return userGameStore.userGames.slice(start, start + gamesPerPage)
 })
+
+const totalPages = computed(() => {
+  return Math.ceil(userGameStore.userGames.length / gamesPerPage)
+})
+
+watch
+
 </script>
 
 <template>
@@ -61,23 +64,24 @@ const filteredUserGame = computed(() => {
   <ProfileNavBar :selectTab="activeTab" @update:tab="activeTab = $event" />
   
   <div v-if="activeTab === 'all'" class="sub-navbar">
-    <SubNavBar :selectTab="activeTab" @update:tab="activeTab = $event" />
     
     <div>
         <UserGameCard
-            v-for="userGame in filteredUserGame"
+            v-for="userGame in paginatedGames"
             :key="userGame.game.id"
             :games="userGame"
             ></UserGameCard>
     </div>
+    <Pagination 
+      :totalPages="totalPages"
+      :currentPage="currentPage"
+      @update:currentPage="currentPage = $event" /> 
     </div>
 
     <div v-else-if ="activeTab === 'stats'">
       <GameInProgress :games="userGameStore.userGames" />
       <GameByPlatform :games="userGameStore.userGames" />
       <GameSpentTime :games="userGameStore.userGames" />
-
-
 
     </div>
 

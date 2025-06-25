@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {computed} from 'vue';
-import { Doughnut } from 'vue-chartjs';
-import { ArcElement, Chart, Legend, plugins, Title, Tooltip, type ChartOptions  } from 'chart.js';
+import { Bar } from 'vue-chartjs';
+import { BarElement, CategoryScale, Chart, Legend, LinearScale, Title, Tooltip, type ChartOptions  } from 'chart.js';
 
 import type { UserGame } from '~/types/UserGame';
 
 
-Chart.register(Title, Tooltip, Legend, ArcElement)
+Chart.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 const props = defineProps<{
     games: UserGame[]
@@ -21,25 +21,34 @@ const gameFinished = computed(() => {
 })
 
 const data = computed(() => ({
-    labels: ['Jeux en cours', 'Jeux terminés'],
+    labels: ['En cours', 'Terminés', 'Non commencés'],
     datasets: [{
+        label: 'Nombre de jeux',
         backgroundColor: ['#3498db', '#2ecc71'],
         data: [gameInProgress.value, gameFinished.value]
     }]
 }))
 
-const options: ChartOptions<'doughnut'> = {
+const options: ChartOptions<'bar'> = {
     responsive: true,
     plugins: {
-        legend: {position: "top"},
+        legend: {display: false},
         title: {display: true, text: 'Répartition des jeux en cours et terminés '}
+    },
+    scales: {
+        y: {
+            beginAtZero: true,
+            ticks: {
+                stepSize: 1
+            }
+        }
     }
 }
 </script>
 
 <template>
  <div class="chart">
-    <Doughnut :data="data" :options="options" />
+    <Bar :data="data" :options="options" />
  </div>
 </template>
 
