@@ -1,31 +1,46 @@
 
 <script setup lang="ts">
-
 import type { Game } from '@/types/Game';
 import type { UserGame } from '~/types/UserGame';
+
 const props = defineProps<{
     showModal: boolean;
     game: UserGame;
+    statusGame: 'inProgress' | 'finished'
 }>()
 
-const emit = defineEmits()
+const emit = defineEmits<{
+  (event: 'close'):void
+  (event: 'submit', data: {date:string, time?:number}): void
+}>()
 
 const selectTimeSpent = ref(props.game.timeSpent?.toString() ?? '')
 const isSubmitting = ref(false)
+const selectedDate = ref('')
 
 const closeModal = () => {
     emit('close')
 }
 
 const handleSubmit = () => {
-  const time = parseInt(selectTimeSpent.value)
 
-    if (isNaN(time)|| isSubmitting.value) {
+  if(!selectedDate.value || isSubmitting.value) {
+    return
+  }
+
+  const time = props.statusGame === 'finished' ?  parseInt(selectTimeSpent.value) : undefined
+
+
+    if (props.statusGame === 'finished' && (isNaN(time!) || time! < 0)) {
         return
     }
 
     isSubmitting.value = true
-    emit('submit', time)
+
+    emit('submit', {
+      date: selectedDate.value,
+      time: time
+    })
 }
 
 </script>
@@ -34,14 +49,30 @@ const handleSubmit = () => {
 
 <div class="modal-overlay">
     <div class="modal">
-        <h2>Veuillez indiquer le temps que vous avez passé sur le jeu</h2>
+        <h2>{{ props.statusGame === 'inProgress' ? `Quand avez vous commencé ${props.game.game.name}` : `Quand avez vous terminé ${props.game.game.name}`}}</h2>
         <div class="input-container">
+          <label for="date-input">Date : 
+            <input
+            type="date"
+            v-model="selectedDate"
+            />
+            </label>
+            <div v-if="props.statusGame === 'finished'">
+              <label> Temps passé :
             <input
             type="number"
             v-model="selectTimeSpent"
             placeholder="Entrez le nombre d'heures sur le jeu"
+            min="0"
             />
+            </label>
+            
         </div>
+
+        </div>
+
+         
+
         <div class="modal-actions">
             <button @click="handleSubmit" :disabled="isSubmitting" >Confirmer</button>
             <button @click="closeModal">Annuler</button>

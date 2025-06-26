@@ -35,7 +35,7 @@ const data = computed(() => {
 const options: ChartOptions<'doughnut'> = {
     responsive: true,
     plugins: {
-        legend: {position: "top"},
+        legend: {display: false},
         title: {display: true, text: 'Nombre de jeux par plateforme'}
     }
 }

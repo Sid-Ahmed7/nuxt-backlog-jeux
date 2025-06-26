@@ -3,9 +3,10 @@ import { useGameUtils } from '~/utils/useGameUtils';
 import { useUserGamesStore } from '@/stores/useUserGamesStore';
 import type { UserGame } from '@/types/UserGame';
 import TimeModal from '@/components/Games/TimeModal.vue';
+import { GameStatus } from '~/types/enums';
 
-const {getCoverUrl} = useGameUtils()
-const userGamesStore  = useUserGamesStore();
+const { getCoverUrl } = useGameUtils()
+const userGamesStore = useUserGamesStore();
 
 const props = defineProps<{
   games: UserGame
@@ -14,45 +15,85 @@ const props = defineProps<{
 const showModal = ref(false)
 const isSubmitting = ref(false)
 
+const isFinished = computed(() => {
+  return props.games.status === GameStatus.Finished
+})
 
-const handleSubmitTimeGame = async (time:number) => {
-  isSubmitting.value = true
-  if(props.games.game.id) {
-    await userGamesStore.updateGameTime(props.games.game?.id, time)
-    await userGamesStore.toggleFinished(props.games.game.id)
-    showModal.value = false
+const status = computed(() => {
+  switch (props.games.status) {
+    case GameStatus.NotStarted:
+      return 'Non commencé';
+    case GameStatus.InProgress:
+      return 'En cours';
+    case GameStatus.Finished:
+      return 'Terminé';
+    default:
+      return 'Non commencé'
   }
+})
+
+const labelBtn = computed(() => {
+  switch (props.games.status) {
+    case GameStatus.NotStarted:
+      return 'Marqué comme en cours';
+    case GameStatus.InProgress:
+      return 'Marqué comme terminé';
+    case GameStatus.Finished:
+      return 'Marqué comme en cours';
+    default:
+      return 'Aucun changement'
+  }
+})
+
+const handleSubmitTimeGame = async ({ date, time }: { date: string; time?: number }) => {
+
+  isSubmitting.value = true
+
+  if (!props.games.game.id) {
+    return
+  }
+
+  if (props.games.status === GameStatus.NotStarted) {
+    await userGamesStore.updateStatus(props.games.game.id!, GameStatus.InProgress, date)
+  } else if (props.games.status === GameStatus.InProgress) {
+    await userGamesStore.updateGameTime(props.games.game?.id!, time ?? 0)
+    await userGamesStore.updateStatus(props.games.game.id!, GameStatus.Finished, props.games.started_at, date)
+  }
+
+  showModal.value = false
   isSubmitting.value = false
 
 }
 
 const handleRemove = () => {
 
-  if(props.games.game.id) {
+  if (props.games.game.id) {
     userGamesStore.removeGameInUserList(props.games.game.id)
   }
-  
+
 }
 
-const toggleFinished = () => {
-
-  if(!props.games.isFinished && props.games.game.id) {
-    showModal.value = true
-  } else if (props.games.isFinished && props.games.game.id) {
-    userGamesStore.toggleFinished(props.games.game.id)
+const toggleStatusGame = () => {
+  if (!props.games.game.id) {
+    return
   }
+
+  if (props.games.status === GameStatus.NotStarted) {
+    showModal.value = true
+  } else if (props.games.status === GameStatus.InProgress) {
+    showModal.value = true
+  } else if (props.games.status === GameStatus.Finished) {
+    userGamesStore.updateStatus(props.games.game.id!, GameStatus.InProgress, props.games.started_at)
+  }
+
+
 }
 
 </script>
 
 <template>
   <div class="user-game-card">
-    <img
-      v-if="games.game.cover?.image_id"
-      :src="getCoverUrl(games.game.cover.image_id)"
-      alt="Cover"
-      class="cover"
-    />
+    <img v-if="games.game.cover?.image_id" :src="getCoverUrl(games.game.cover.image_id)" alt="Cover" class="cover" />
 
     <div class="game-info">
       <h2>{{ games.game.name }}</h2>
@@ -64,30 +105,32 @@ const toggleFinished = () => {
       </div>
 
       <div class="status-time">
-        <span class="status">Status : {{ games.isFinished ? '✅ Terminé' : '🕹️ En cours' }}</span>
-        <span class="time">Temps passé : {{ games.timeSpent !== undefined ? games.timeSpent + ' h' : 'Non renseigné' }}</span>
+        <span class="status">Status : {{ status }}</span>
+        <span class="time">Temps passé : {{ games.timeSpent !== undefined ? games.timeSpent + ' h' : 'Non renseigné'}}</span>
+        <div class="date">
+        <span v-if="games.started_at">Début : {{ new Date(games.started_at).toLocaleDateString() }}</span>
+        <span v-if="games.ended_at">Fin : {{ new Date(games.ended_at).toLocaleDateString() }}</span>
+        </div>
       </div>
 
       <div class="actions">
-        <button @click="toggleFinished" :class="{ 'completed-btn': games.isFinished }">
-          {{ games.isFinished ? 'Marquer comme en cours' : 'Marquer comme terminé' }}
+
+        <button @click="toggleStatusGame" :class="{ 'completed-btn': isFinished }">
+          {{ labelBtn }}
         </button>
         <button @click="handleRemove" class="remove-btn">
           Supprimer
         </button>
       </div>
     </div>
-    <TimeModal
-    v-if="showModal"
-    :showModal="showModal"
-    :game="games"
-    @submit="handleSubmitTimeGame"
-    @close="showModal = false"
-    ></TimeModal>
+    <TimeModal v-if="showModal" :showModal="showModal" :game="games"
+      :statusGame="games.status === GameStatus.InProgress ? 'finished' : 'inProgress'" @submit="handleSubmitTimeGame"
+      @close="showModal = false"></TimeModal>
   </div>
 </template>
 
 <style scoped>
+
 .user-game-card {
   display: flex;
   background: rgba(255, 255, 255, 0.05);
@@ -141,13 +184,17 @@ const toggleFinished = () => {
   color: #ddd;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 1rem;
+}
+.date {
+  display: flex;
+  gap: 1rem;
 }
 
 .actions {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .actions button {
@@ -183,7 +230,7 @@ const toggleFinished = () => {
 
 @media (max-width: 600px) {
   .user-game-card {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     width: 100%;
   }
 
@@ -192,6 +239,8 @@ const toggleFinished = () => {
     height: 200px;
     border-radius: 16px 16px 0 0;
   }
+  .status-time {
+     grid-template-columns: 1fr;
+  }
 }
-
 </style>

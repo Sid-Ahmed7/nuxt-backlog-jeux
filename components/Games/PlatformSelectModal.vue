@@ -1,9 +1,5 @@
 <script setup lang="ts">
 import type { Game } from '@/types/Game'
-import { useGameUtils } from '~/utils/useGameUtils'
-
-
-const { getLogoUrl } = useGameUtils()
 
 const emit = defineEmits(['close', 'select'])
 const props = defineProps<{
@@ -39,9 +35,6 @@ const handleSubmit = () => {
             <input type="radio"
                 :value="platform.id"
                 v-model="selectedPlatformId" />
-                <div class="platform-image">
-                    <img :src="getLogoUrl(platform.platform_logo?.image_id)" :alt="platform.name" />
-                </div>
                 <div class="platform-name">
                     <h3>{{ platform.name }}</h3>
                 </div>
@@ -83,10 +76,13 @@ const handleSubmit = () => {
 }
 
 .platform-list {
+    max-height: 300px;
+    overflow-y: auto;
+    justify-content: flex-start;
     display: flex;
     flex-wrap: column;
     gap: 1rem;
-    justify-content: center;
+
     width: 100%;
 }
 
@@ -104,16 +100,7 @@ const handleSubmit = () => {
     margin-right: 1rem;
 }
 
-.platform-image {
-    width: 50%;
-    height: 50%;
-}
-.platform-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 0.5rem;
-}
+
 
 .modal-actions {
     display: flex;

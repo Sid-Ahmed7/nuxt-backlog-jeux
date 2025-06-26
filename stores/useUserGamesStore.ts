@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import type { Game } from '@/types/Game'
 import type { UserGame } from '~/types/UserGame'
 import  type { Database } from '@/supabase'
+import { GameStatus } from '~/types/enums'
 
 
 
@@ -19,8 +20,11 @@ export const useUserGamesStore = defineStore('userGames', () => {
             return 
         }
 
+        console.log('DB',data)
+
         const gamesFromIgdb = await Promise.all(
             data.map(async (game: any ) => {
+                 console.log('Raw status from DB entry:', game.status)
                 try {
                     const gamesList = await $fetch<Game[]>(`/api/game/${game.id_game}`)
                     const gameData = gamesList[0]
@@ -32,11 +36,13 @@ export const useUserGamesStore = defineStore('userGames', () => {
                             name: gameData.name,
                             cover: gameData.cover ? { id: gameData.cover.id, image_id: gameData.cover.image_id } : undefined,
                         },
-                        isFinished: game.isFinished,
-                        platform_choose: game.platform_choose || game.platform_name,  // string ici
-                        timeSpent: game.timeSpent,
+                        platform_choose: game.platform_choose ?? game.platform_name,
+                        status: game.status ?? GameStatus.NotStarted,
+                        started_at: game.started_at ?? undefined,
+                        ended_at: game.ended_at ?? undefined,
+                        timeSpent: game.timeSpent ?? undefined,
                     } as UserGame
-
+                    
                 } catch (err) {
                     return
                 }
@@ -58,18 +64,18 @@ export const useUserGamesStore = defineStore('userGames', () => {
                 user_id: user.id,
                 id_game: game.id,
                 platform_choose: platformName,
-                isFinished: false,
+                status: GameStatus.NotStarted
             }
         ])
 
 
             userGames.value.push({
                 game,
-                isFinished:false,
                 platform_choose: platformName,
+                status: GameStatus.NotStarted,
                 timeSpent: 0
             })
-        
+             console.log('Jeu ajouté à userGames.value:', userGames.value)
     }
 
     const removeGameInUserList = async (gameId: number) => {
@@ -83,28 +89,50 @@ export const useUserGamesStore = defineStore('userGames', () => {
         userGames.value = userGames.value.filter(g => g.game.id !== gameId)
     }
 
-    const toggleFinished = async (gameId : number) => {
+    const updateStatus = async (gameId: number, newStatus: GameStatus, started_at?: string, ended_at?: string) => {
+        
+        const {data: {user}} = await supabase.auth.getUser()
 
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) {
-          return
-        }
-
-        const game = userGames.value.find(g => g.game.id === gameId)
-        if (!game) { return }
-
-        game.isFinished = !game.isFinished
-
-        const {error} = await supabase
-        .from('games')
-        .update({isFinished:  game.isFinished})
-        .eq('user_id', user.id)
-        .eq('id_game', gameId)
-
-        if (error) {
+        if(!user) {
             return
         }
 
+        const updatesData: {status: GameStatus,started_at?: string, ended_at?: string} = {
+            status: newStatus
+        }
+
+        if(started_at) {
+            updatesData.started_at = started_at
+        }
+
+        if(ended_at) {
+            updatesData.ended_at = ended_at
+        }
+
+        const {error} = await supabase
+        .from('games')
+        .update(updatesData)
+        .eq('user_id', user.id)
+        .eq('id_game', gameId)
+
+        if(error) {
+            console.error("Erreur lors de la modficiation du status", error.message)
+            return
+        }
+
+        const game = userGames.value.find(g=> g.game.id === gameId)
+        if(game) {
+
+            game.status = newStatus
+            
+            if(started_at) {
+                game.started_at = started_at
+            }
+
+            if(ended_at) {
+                game.ended_at = ended_at
+            }
+        } 
     }
 
     const updateGameTime = async(gameId: number, timeSpent: number) => {
@@ -133,5 +161,5 @@ export const useUserGamesStore = defineStore('userGames', () => {
 
 
 
-    return { userGames, addGameInUserList, removeGameInUserList, toggleFinished,fetchUserGames, updateGameTime}
+    return { userGames, addGameInUserList, removeGameInUserList, updateStatus,fetchUserGames, updateGameTime}
 })  

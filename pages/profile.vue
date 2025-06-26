@@ -5,7 +5,6 @@ import ProfileHeader from '@/components/Profile/ProfileHeader.vue';
 import ProfileNavBar from '@/components/Profile/ProfileNavBar.vue';
 import GameInProgress from '~/components/Chart/GameStatus.vue';
 import GameByPlatform from '@/components/Chart/GameByPlatform.vue';
-import GameSpentTime from '@/components/Chart/GameSpentTime.vue';
 import UserGameCard from '@/components/Games/UserGameCard.vue';
 import Pagination from '@/components/Pagination.vue';
 import { useUserGamesStore } from '@/stores/useUserGamesStore';
@@ -65,7 +64,7 @@ watch
   
   <div v-if="activeTab === 'all'" class="sub-navbar">
     
-    <div>
+    <div class="user-games">
         <UserGameCard
             v-for="userGame in paginatedGames"
             :key="userGame.game.id"
@@ -78,11 +77,13 @@ watch
       @update:currentPage="currentPage = $event" /> 
     </div>
 
-    <div v-else-if ="activeTab === 'stats'">
+    <div v-else-if ="activeTab === 'stats'" class="stats">
+      <div class="chart-card">
       <GameInProgress :games="userGameStore.userGames" />
+      </div>
+      <div class="chart-card">
       <GameByPlatform :games="userGameStore.userGames" />
-      <GameSpentTime :games="userGameStore.userGames" />
-
+      </div>
     </div>
 
 </div>
@@ -94,10 +95,36 @@ watch
 
 <style scoped>
 
-
+.user-games {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap:1.5rem;
+  padding: 1rem;
+}
 .sub-navbar {
   margin-top: 2rem;
 }
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.chart-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  max-width: 600px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+
 .loading {
   text-align: center;
   margin-top: 50px;
