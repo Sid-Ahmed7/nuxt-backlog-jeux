@@ -5,6 +5,7 @@ export interface Game {
       id: number
       image_id: string
     }
+    slug?: string;
     genres?: {
       id: number
       name: string
@@ -52,6 +53,7 @@ export interface Game {
         id: number
         image_id: string
       }
+      slug?: string
     }[]
     expanded_games?: {
       id: number
@@ -60,6 +62,7 @@ export interface Game {
         id: number
         image_id: string
       }
+      slug?: string
     }[]
     expansions?: {
       id: number
@@ -76,6 +79,7 @@ export interface Game {
         id: number
         image_id: string
       }
+      slug?: string
     }[]
     multiplayer_modes?: {
       id:number

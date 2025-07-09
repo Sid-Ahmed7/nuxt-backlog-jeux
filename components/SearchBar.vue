@@ -31,7 +31,6 @@ const handleSearchInput = () => {
 .search-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  padding-right: 3rem;
   border: 1px solid #ccc;
   border-radius: 100px;
   font-size: 1rem;

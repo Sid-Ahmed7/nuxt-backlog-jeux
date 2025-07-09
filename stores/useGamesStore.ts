@@ -14,6 +14,7 @@ export const useGamesStore = defineStore('games', () => {
               id: game.id,
               name: game.name,
               cover: game.cover ? { id: game.cover.id, image_id: game.cover.image_id } : undefined,
+              slug: game.slug || '',
               summary: game.summary,
               genres: game.genres || [],
               involved_companies: game.involved_companies || [],
@@ -41,5 +42,26 @@ export const useGamesStore = defineStore('games', () => {
     } 
 
   }
-  return {games, error, fetchGames}
+
+      const isUpcoming = (game: Game) => {
+        if(!game.first_release_date) {
+            return false
+        }
+        
+        const now = new Date()
+        const nextWeek = new Date()
+        nextWeek.setDate(now.getDate() + 50)
+        const releaseDate = new Date(game.first_release_date * 1000)
+        return releaseDate >= now && releaseDate <= nextWeek
+    }
+
+    
+    const upComingGames = computed(() => {
+       
+            return games.value.filter(isUpcoming).sort((a, b) => 
+                (a.first_release_date ?? 0) - (b.first_release_date ?? 0)
+            )
+        
+    })
+  return {games, error, fetchGames,upComingGames}
 })

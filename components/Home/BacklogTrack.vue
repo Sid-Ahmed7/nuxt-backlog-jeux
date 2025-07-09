@@ -1,3 +1,6 @@
+<script setup lang="ts">
+</script>
+
 <template>
         <section class="title-section">
       <h1 class="main-title">BacklogTrack</h1>

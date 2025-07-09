@@ -73,16 +73,16 @@ const openLightbox = () => {
 const closeLightBox =() => {
   showLightbox.value = false
 }
-
-
-onMounted( () => {
-  const gameName = route.params.gameName as string;
-  const fetchedGame = gamesStore.games.find((game) => game.name === gameName);
+  const gameSlug = route.params.slug as string;
+  const fetchedGame = gamesStore.games.find((game) => game.slug === gameSlug);
   if (fetchedGame) {
     game.value = fetchedGame;
   } else {
     router.push('/404');
   }
+
+onMounted( () => {
+console.log(route.params.slug)
 });
 
 </script>
@@ -166,7 +166,7 @@ onMounted( () => {
     <h3>Extensions du jeu</h3>
     <ul>
       <li v-for="expanded in game.expanded_games" :key="expanded.id">
-        <NuxtLink :to="`/catalogue-de-jeu/${game?.name || 'Jeu inconnu'}`">
+        <NuxtLink :to="`/catalogue-de-jeu/${expanded?.slug || 'jeu-inconnu'}`">
         <img :src="getCoverUrl(expanded.cover?.image_id)" alt="extensions" class="expanded-cover" />
       </NuxtLink>
         <span>{{ expanded.name }}</span>
@@ -178,7 +178,7 @@ onMounted( () => {
     <h3>DLCs</h3>
     <ul>
       <li v-for="dlc in game.dlcs" :key="dlc.id">
-        <NuxtLink :to="`/catalogue-de-jeu/${game?.name || 'Jeu inconnu'}`">
+        <NuxtLink :to="`/catalogue-de-jeu/${dlc?.slug || 'inconnu'}`">
         <img :src="getCoverUrl(dlc.cover?.image_id)" alt="DLC" class="dlc-cover" />
       </NuxtLink>
         <span>{{ dlc.name }}</span>
@@ -190,7 +190,7 @@ onMounted( () => {
     <h3>Jeux similaires</h3>
     <ul>
       <li v-for="similar in game.similar_games" :key="similar.id">
-   <NuxtLink :to="`/catalogue-de-jeu/${encodeURIComponent(similar?.name || 'Jeu inconnu')}`">
+   <NuxtLink :to="`/catalogue-de-jeu/${similar?.slug || 'Jeu inconnu'}`">
 
         <img :src="getCoverUrl(similar.cover?.image_id)" alt="jeux similaires" class="similar-cover" />
       </NuxtLink>

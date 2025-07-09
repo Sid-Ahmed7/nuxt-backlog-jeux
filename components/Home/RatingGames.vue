@@ -14,7 +14,7 @@ const topRatedGames = computed(() => {
   }
 
   const topRated = gamesStore.games.filter((game) => {
-    return game.total_rating_count !== undefined
+    return game.total_rating_count
   })
 
   return topRated
@@ -24,9 +24,6 @@ const topRatedGames = computed(() => {
     .slice(0, 5)
 })
 
-onMounted(async () => {
-  await gamesStore.fetchGames()
-})
 
 
 </script>
@@ -39,7 +36,7 @@ onMounted(async () => {
     <div class="games-lists">
       <div v-for="game in topRatedGames" :key="game.id" class="game-item">
         <div class="game-cover">
-          <NuxtLink :to="`/catalogue-de-jeu/${game.id}`">
+          <NuxtLink :to="`/catalogue-de-jeu/${game.slug}`">
             <img :src="getCoverUrl(game.cover?.image_id)" :alt="game.name" />
           </NuxtLink>
         </div>

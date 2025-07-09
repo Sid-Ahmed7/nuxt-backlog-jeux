@@ -6,6 +6,7 @@ import { usePlatformsStore } from '@/stores/usePlatformsStore'
 import { useThemeStore } from '@/stores/useThemeStore'
 import { useGamesModesStore } from '@/stores/useGamesModesStore'
 import { useGameFilters } from '@/composables/useGameFilters'
+import { useUpcomingGames } from '@/composables/useUpcomingGames'
 import GamesList from '@/components/Games/GameList.vue'
 import GameFilters from '@/components/Games/GameFilters.vue'
 import SearchBar from '~/components/SearchBar.vue'
@@ -17,7 +18,9 @@ const genresStore = useGenresStore()
 const platformsStore = usePlatformsStore()
 const themesStore = useThemeStore()
 const gameModesStore = useGamesModesStore()
-const { selectedGenres,
+
+
+const {selectedGenres,
   selectedPlatforms,
   selectedGameModes,
   selectedThemes,
@@ -30,30 +33,27 @@ const { selectedGenres,
   onSearch,
   gamesPerPage,
   gamesStore,
-  error } = useGameFilters()
+  error } = useUpcomingGames()
 
 const showFilters = ref(false)
-onMounted(async () => {
-  await gamesStore.fetchGames()
-  await platformsStore.fetchPlatforms()
-  await genresStore.fetchGenres()
-  await themesStore.fetchThemes()
-  await gameModesStore.fetchGamesModes()
-  console.log('Games:', gamesStore.games)
-})
 
 watch(showFilters, (open) => {
   document.body.style.overflow = open ? 'hidden' : ''
 })
 
 
-
+onMounted(async () => {
+  await platformsStore.fetchPlatforms()
+  await genresStore.fetchGenres()
+  await themesStore.fetchThemes()
+  await gameModesStore.fetchGamesModes()
+})
 </script>
 
 <template>
   <div class="catalogue-view">
     <div class="header">
-      <h1 class="catalogue-title">Catalogue des jeux</h1>
+      <h1 class="catalogue-title">Prochaine sortie</h1>
       <div class="search-bar">
         <SearchBar @search="onSearch" />
       </div>
@@ -79,7 +79,7 @@ watch(showFilters, (open) => {
         <h2>Aucun résultat trouvé</h2>
       </div>
       <section v-else class="games-section">
-        <GamesList :games="paginatedGames" :error="error" />
+        <GamesList :games="paginatedGames ?? []" :error="error" />
         <div class="pagination">
           <Pagination :currentPage="currentPage" :totalPages="totalPages" @update:currentPage="currentPage = $event" />
         </div>

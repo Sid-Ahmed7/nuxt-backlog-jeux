@@ -11,7 +11,6 @@ const props = defineProps<{
   selectedGenre: string[]
   selectedGameMode: string[]
   selectedTheme: string[]
-  selectedRating: [number, number]
 }>()
 
 const emit = defineEmits()
@@ -20,7 +19,6 @@ const selectedPlatform = ref(props.selectedPlatforms || [])
 const selectedGenreRef = ref(props.selectedGenre || [])
 const selectedGameMode = ref(props.selectedGameMode || [])
 const selectedTheme = ref(props.selectedTheme || [])
-const selectedRating = ref<[number, number]>(props.selectedRating || [1, 10])
 
 watch(selectedPlatform, (newPlatforms) => {
   emit('update:selectedPlatforms', newPlatforms)
@@ -35,9 +33,7 @@ watch(selectedGameMode, (newGameMode) => {
 watch(selectedTheme, (newTheme) => {
   emit('update:selectedTheme', newTheme)
 })
-watch(selectedRating, (newRating) => {
-  emit('update:selectedRating', newRating)
-})
+
 </script>
 
 <template>
@@ -81,14 +77,6 @@ watch(selectedRating, (newRating) => {
         <input type="checkbox" :value="theme.name" v-model="selectedTheme" />
       </div>
     </div>
-
-    <!-- <div class="filter-item">
-      <h3>Filtrer par note</h3>
-      <USlider v-model="selectedRating" :min="1" :max="10" :step="0.1" color="green" />
-      <div class="rating-display">
-        <span>{{ selectedRating[0].toFixed(1) }} - {{ selectedRating[1].toFixed(1) }}</span>
-      </div>
-    </div> -->
   </div>
 </template>
 

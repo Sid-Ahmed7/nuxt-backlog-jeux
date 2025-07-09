@@ -8,6 +8,7 @@ currentPage: number
 
 const emit = defineEmits()
 
+const nbPages = ref(5)
 const hasPreviousPage = computed(() => props.currentPage > 1)
 const hasNextPage = computed(() => props.currentPage < props.totalPages)
 
@@ -18,12 +19,34 @@ const goToPage = (page: number) => {
 
 const pages = computed(() => {
   const pagesArray = []
-  const firstPage = Math.max(1, props.currentPage - 2)
-  const lastPage = Math.min(props.totalPages, props.currentPage + 2)
-  for (let i = firstPage; i <= lastPage; i++) {
+  let startPage = Math.max(1, props.currentPage - Math.floor(nbPages.value / 2))
+  let endPage = Math.min(props.totalPages, props.currentPage + 2)
+  
+  if( endPage - startPage < nbPages.value -1) {
+    startPage = Math.max(1, endPage - nbPages.value + 1)
+  }
+  
+  for (let i = startPage; i <= endPage; i++) {
     pagesArray.push(i)
   }
   return pagesArray
+})
+
+const updateNbPages = () => {
+  if(window.innerWidth < 600) {
+    nbPages.value = 3
+  } else  {
+    nbPages.value = 5
+  }
+}
+
+onMounted(() => {
+  updateNbPages()
+  window.addEventListener('resize', updateNbPages)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateNbPages)
 })
 </script>
 

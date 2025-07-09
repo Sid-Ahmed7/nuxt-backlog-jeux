@@ -3,9 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@pinia/nuxt', '@nuxtjs/supabase'],
 
-  routeRules: {
-    '/**': { appMiddleware: ['auth-global'] },
-  },
+
 
   runtimeConfig: {
     api: {
@@ -17,7 +15,7 @@ export default defineNuxtConfig({
       supabase: {
         url: process.env.SUPABASE_URL,
         key: process.env.SUPABASE_KEY,
-        redirect: true,
+        redirect: false,
         redirectOptions: {
           login: '/login',
           callback: '/',

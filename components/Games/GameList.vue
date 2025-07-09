@@ -19,8 +19,7 @@ const props = defineProps<{
     <div v-else>
       <ul>
         <li v-for="game in games" :key="game.id">
-          
-          <NuxtLink :to="`/catalogue-de-jeu/${game?.name || 'Jeu inconnu'}`">
+          <NuxtLink :to="`/catalogue-de-jeu/${game?.slug || 'Jeu inconnu'}`">
             <div class="cover-image">
               <img
                 v-if="game.cover"
