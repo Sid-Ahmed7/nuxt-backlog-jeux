@@ -2,14 +2,16 @@ import { defineStore } from "pinia";
 import { ref, watch } from "vue";
 import type { User } from "@/types/AuthUser";
 import type { Database } from "@/supabase";
+import type { RegisterData } from "~/types/RegisterData";
 
 export const useAuthStore = defineStore("auth", () => {
   const supabase = useSupabaseClient<Database>();
-const supabaseUser = useSupabaseUser()
+  const supabaseUser = useSupabaseUser()
 
   const user = ref<User | null>(null);
   const error = ref<string | null>(null);
   const isLoading = ref(true);
+  const messageSuccess = ref<string | null>(null);
 
   const fetchUserProfile = async (userId: string) => {
     const { data: userProfile, error: profilError } = await supabase
@@ -57,8 +59,9 @@ const supabaseUser = useSupabaseUser()
   });
 
   const login = async (email: string, password: string) => {
-    error.value = null;
     isLoading.value = true;
+    messageSuccess.value = null;
+    error.value = null;
 
     try {
       const { data, error: loginError } = await supabase.auth.signInWithPassword({
@@ -68,9 +71,7 @@ const supabaseUser = useSupabaseUser()
 
       if (loginError) {
         error.value = loginError.message;
-        user.value = null;
-        isLoading.value = false;
-        return;
+        return error.value;
       }
 
       if (data.user) {
@@ -84,12 +85,12 @@ const supabaseUser = useSupabaseUser()
               username,
             },
           ]);
+
           if (insertError) {
             error.value = insertError.message;
-            user.value = null;
-            isLoading.value = false;
-            return;
+            return error.value;
           }
+
           user.value = {
             id: data.user.id,
             email: data.user.email ?? "",
@@ -102,13 +103,59 @@ const supabaseUser = useSupabaseUser()
             username: profile.username,
           };
         }
+        messageSuccess.value = "Connexion réussie !";
+        return messageSuccess.value;
       }
+          error.value = "Utilisateur non trouvé ou mot de passe incorrect.";
+          return error.value;
     } catch (err) {
       error.value = "Erreur lors de la connexion : " + (err as Error).message;
     } finally {
       isLoading.value = false;
     }
   };
+
+  const register = async (userData: RegisterData) => {
+   
+    const { username, email, password } = userData;
+    isLoading.value = true;
+    error.value = null;
+    messageSuccess.value = null;
+
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { username }
+        }
+    })
+
+    if (signUpError) {
+      error.value = signUpError.message;
+      return error.value;
+    }     
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        error.value = signInError.message;
+        return error.value;
+      }
+
+     messageSuccess.value = "Inscription réussie !";
+     return messageSuccess.value;
+
+  } catch (err) {
+    error.value = "Erreur lors de l'inscritpion : " + (err as Error).message;
+    return error.value;
+  } finally {
+    isLoading.value = false;
+  }
+}
+
 
   const logout = async () => {
     error.value = null;
@@ -124,5 +171,5 @@ const supabaseUser = useSupabaseUser()
     }
   };
 
-  return { user, error, login, logout, isLoading, init };
+  return { user, error, messageSuccess, register, login, logout, isLoading, init };
 });
