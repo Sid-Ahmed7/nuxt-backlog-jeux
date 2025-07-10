@@ -27,7 +27,7 @@ const gameFinished = computed(() => {
 })
 
 const data = computed(() => ({
-    labels: ['En cours', 'Terminés', 'Non commencés'],
+    labels: ['Non commencés','En cours', 'Terminés', ],
     datasets: [{
         label: 'Nombre de jeux',
         backgroundColor: ['#3498db', '#2ecc71', '#e74c3c'],
