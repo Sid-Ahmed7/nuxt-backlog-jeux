@@ -5,7 +5,7 @@ import type { Database } from "@/supabase";
 
 export const useAuthStore = defineStore("auth", () => {
   const supabase = useSupabaseClient<Database>();
-  const supabaseUser = useSupabaseUser();
+const supabaseUser = useSupabaseUser()
 
   const user = ref<User | null>(null);
   const error = ref<string | null>(null);
