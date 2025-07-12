@@ -1,88 +1,95 @@
 <script setup lang="ts">
-import type { RegisterData } from '@/types/RegisterData';
+import type { RegisterData } from "@/types/RegisterData";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const registerForm = ref<RegisterData>({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-})
+  username: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+});
 
-const errorMessage = ref<string>('');
-const successMessage = ref<string>('');
+const errorMessage = ref<string>("");
+const successMessage = ref<string>("");
 const isSubmitting = ref<boolean>(false);
 
 const validateForm = (): boolean => {
-    if (!registerForm.value.username || registerForm.value.username.length < 3 || registerForm.value.username.length > 15) {
-        errorMessage.value = 'Le nom d\'utilisateur doit comporter entre 3 et 15 caractères.';
-        return false;
-    }
-      if (!registerForm.value.email) {
-        errorMessage.value = "L'email est invalide.";
-        return false;
+  if (
+    !registerForm.value.username ||
+    registerForm.value.username.length < 3 ||
+    registerForm.value.username.length > 15
+  ) {
+    errorMessage.value =
+      "Le nom d'utilisateur doit comporter entre 3 et 15 caractères.";
+    return false;
+  }
+  if (!registerForm.value.email) {
+    errorMessage.value = "L'email est invalide.";
+    return false;
   }
 
-    if (!registerForm.value.password || registerForm.value.password.length < 6) {
-        errorMessage.value = 'Le mot de passe doit comporter au moins 6 caractères.';
-        return false;
-    }
-    if (registerForm.value.password !== registerForm.value.confirmPassword) {
-        errorMessage.value = 'Les mots de passe ne correspondent pas.';
-        return false;
-    }
-    errorMessage.value = '';
-    return true;
-}
+  if (!registerForm.value.password || registerForm.value.password.length < 6) {
+    errorMessage.value =
+      "Le mot de passe doit comporter au moins 6 caractères.";
+    return false;
+  }
+  if (registerForm.value.password !== registerForm.value.confirmPassword) {
+    errorMessage.value = "Les mots de passe ne correspondent pas.";
+    return false;
+  }
+  errorMessage.value = "";
+  return true;
+};
 
 const registerUser = async () => {
+  if (!validateForm()) {
+    return;
+  }
 
-    if(!validateForm()) {
-        return
+  isSubmitting.value = true;
+  errorMessage.value = "";
+  successMessage.value = "";
+
+  try {
+    const response = await authStore.register({
+      username: registerForm.value.username,
+      email: registerForm.value.email,
+      password: registerForm.value.password,
+    });
+
+    if (authStore.error) {
+      errorMessage.value = authStore.error;
+    } else {
+      successMessage.value = response;
+      registerForm.value = {
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      };
+
+      router.push("/login");
     }
-
-    isSubmitting.value = true;
-    errorMessage.value = '';
-    successMessage.value = '';
-
-    try {
-        const response = await authStore.register({
-            username: registerForm.value.username,
-            email: registerForm.value.email,
-            password: registerForm.value.password
-        })
-
-        if(authStore.error) {
-            errorMessage.value = authStore.error;
-        } else {
-        successMessage.value = response;
-        registerForm.value = {
-            username: '',
-            email: '',
-            password: '',
-            confirmPassword: ''
-        }
-
-        router.push('/login');
-    }
-    } catch (error) {
-        errorMessage.value = (error as Error).message;
-    } finally {
-        isSubmitting.value = false;
-    }
-} 
-
+  } catch (error) {
+    errorMessage.value = (error as Error).message;
+  } finally {
+    isSubmitting.value = false;
+  }
+};
 </script>
 
-
 <template>
-  <div class="container">
-    <div class="card">
-      <h2>S'inscrire</h2>
-      <form @submit.prevent="registerUser">
+  <div class="flex justify-center items-center min-h-screen">
+    <div
+      class="flex flex-col gap-4 bg-card rounded-4xl shadow-lg w-[400px] p-6"
+    >
+      <h2 class="text-center text-2xl font-semibold text-text-primary mb-6">
+        Inscription
+      </h2>
 
-        <div class="form-group">
+      <form @submit.prevent="registerUser" class="flex flex-col space-y-4">
+        <div class="w-full">
           <input
             type="text"
             id="username"
@@ -91,10 +98,11 @@ const registerUser = async () => {
             required
             minlength="3"
             maxlength="15"
+            class="w-full px-4 py-3 bg-input text-text-primary border border-border rounded-md text-base placeholder:text-text-secondary focus:outline-none focus:border-main"
           />
         </div>
 
-        <div class="form-group">
+        <div class="w-full">
           <input
             type="email"
             id="email"
@@ -102,11 +110,11 @@ const registerUser = async () => {
             v-model="registerForm.email"
             required
             pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+            class="w-full px-4 py-3 bg-input text-text-primary border border-border rounded-md text-base placeholder:text-text-secondary focus:outline-none focus:border-main"
           />
-
         </div>
 
-        <div class="form-group">
+        <div class="w-full">
           <input
             type="password"
             id="password"
@@ -114,106 +122,46 @@ const registerUser = async () => {
             v-model="registerForm.password"
             required
             minlength="8"
+            class="w-full px-4 py-3 bg-input text-text-primary border border-border rounded-md text-base placeholder:text-text-secondary focus:outline-none focus:border-main"
           />
         </div>
 
-        <div class="form-group">
+        <div class="w-full">
           <input
             type="password"
             id="confirm_password"
             placeholder="Confirmez le mot de passe"
             v-model="registerForm.confirmPassword"
             required
+            class="w-full px-4 py-3 bg-input text-text-primary border border-border rounded-md text-base placeholder:text-text-secondary focus:outline-none focus:border-main"
           />
         </div>
 
-        <button type="submit" :disabled="isSubmitting">
+        <button
+          type="submit"
+          :disabled="isSubmitting"
+          class="w-full px-4 py-3 bg-main hover:bg-main-hover disabled:bg-gray-400 disabled:cursor-not-allowed text-text-primary font-medium rounded-md cursor-pointer transition-colors"
+        >
           {{ isSubmitting ? "Inscription..." : "S'inscrire" }}
         </button>
-        <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-
-        <p class="switch">
-          Déjà inscrit ? <NuxtLink to="/login">Se connecter</NuxtLink>
-        </p>
       </form>
+
+      <p v-if="successMessage" class="text-green-500 text-sm text-center">
+        {{ successMessage }}
+      </p>
+      <p v-if="errorMessage" class="text-red-500 text-sm text-center">
+        {{ errorMessage }}
+      </p>
+
+      <p class="text-center text-text-secondary mt-4">
+        Déjà inscrit ?
+        <NuxtLink
+          to="/login"
+          class="text-main hover:text-main-hover hover:underline"
+        >
+          Se connecter
+        </NuxtLink>
+      </p>
     </div>
   </div>
 </template>
-
-<style scoped>
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.card {
-  background: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 24px;
-  font-weight: 600;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  border: none;
-  color: white;
-  font-size: 16px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.success {
-  color: green;
-  font-size: 14px;
-  text-align: center;
-  margin-top: 10px;
-}
-
-.error-message {
-  color: red;
-   font-size: 14px;
-  text-align: center;
-  margin-top: 10px;
-}
-
-.switch {
-  text-align: center;
-  margin-top: 10px;
-}
-
-.switch a {
-  color: #007bff;
-  text-decoration: none;
-}
-</style>

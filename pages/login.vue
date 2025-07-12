@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import type { Database } from "../supabase";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useAuthStore } from "../stores/auth";
 
 const supabase = useSupabaseClient<Database>();
 const router = useRouter();
@@ -38,7 +38,7 @@ const handleSubmit = async ({
       class="flex flex-col justify-between gap-4 bg-card text-white rounded-4xl shadow-lg w-96 p-6"
     >
       <h2 class="text-center mb-6 text-2xl font-semibold text-text-primary">
-        Se connecter
+        Connexion
       </h2>
 
       <LoginForm @submit="handleSubmit" />
