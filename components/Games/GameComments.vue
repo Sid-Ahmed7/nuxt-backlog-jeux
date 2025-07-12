@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import {useAuthStore} from '@/stores/useAuthStore'
+
 import  type { Database } from '@/supabase'
+import type { UserComment } from '@/types/UserComment';
 
 
 const props = defineProps<{
@@ -12,7 +13,7 @@ const authStore = useAuthStore()
 const user = authStore.user
 
 const newComment = ref('')
-const comments = ref<Array<{id: string; userId: string; gameId: string; content: string; created_at: string}>>([]);
+const comments = ref<UserComment[]>([])
 
 const fetchComments = async () => {
     if(!props.gameId) {

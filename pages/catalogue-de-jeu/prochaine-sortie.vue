@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useGamesStore } from '@/stores/useGamesStore'
-import { useGenresStore } from '@/stores/useGenresStore'
-import { usePlatformsStore } from '@/stores/usePlatformsStore'
-import { useThemeStore } from '@/stores/useThemeStore'
-import { useGamesModesStore } from '@/stores/useGamesModesStore'
-import { useGameFilters } from '@/composables/useGameFilters'
+
 import { useUpcomingGames } from '@/composables/useUpcomingGames'
 import GamesList from '@/components/Games/GameList.vue'
 import GameFilters from '@/components/Games/GameFilters.vue'

@@ -1,9 +1,8 @@
 import type { Game } from "@/types/Game";
-import { useGamesStore } from "@/stores/useGamesStore";
 
 export function useGameFilters() {
-  const gamesStore = useGamesStore();
 
+  const games = ref<Game[]>([]);
   const selectedGenres = ref<string[]>([]);
   const selectedPlatforms = ref<string[]>([]);
   const selectedGameModes = ref<string[]>([]);
@@ -13,8 +12,10 @@ export function useGameFilters() {
   const currentPage = ref(1);
   const gamesPerPage = 50;
 
+
+
   const filteredGames = computed(() => {
-    return gamesStore.games.filter((game) => {
+    return games.value.filter((game) => {
       const matchesSearch = game.name?.toLowerCase().includes(searchQuery.value.toLowerCase());
 
       const matchesPlatform = selectedPlatforms.value.length === 0 || (Array.isArray(game.platforms) && game.platforms.some((platform) =>
@@ -61,6 +62,7 @@ export function useGameFilters() {
   });
 
   return {
+    games,
     selectedGenres,
     selectedPlatforms,
     selectedGameModes,
@@ -73,7 +75,6 @@ export function useGameFilters() {
     noResults,
     onSearch,
     gamesPerPage,
-    gamesStore,
     error
   };
 }

@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import type { Game } from '@/types/Game'
-import { useGameUtils } from '~/utils/useGameUtils'
 import defaultCover from '@/assets/images/default_cover.png'
 
 

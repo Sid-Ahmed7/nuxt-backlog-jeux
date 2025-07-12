@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useAuthStore } from '@/stores/useAuthStore'
-
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -39,9 +36,7 @@ const logout = async () => {
       <li>
         <NuxtLink to="/catalogue-de-jeu">Jeux</NuxtLink>
       </li>
-      <li>
-        <NuxtLink to="/a-propos">À propos</NuxtLink>
-      </li>
+
       <li v-if="!authStore.user">
         <NuxtLink to="/login">Connexion</NuxtLink>
       </li>
@@ -51,8 +46,11 @@ const logout = async () => {
       <li v-if="authStore.user">
         <NuxtLink to="/profile">Profil</NuxtLink>
       </li>
+            <li>
+        <NuxtLink to="/a-propos">À propos</NuxtLink>
+      </li>
       <li v-if="authStore.user">
-        <NuxtLink to="#" @click.prevent="authStore.logout">Déconnexion</NuxtLink>
+        <NuxtLink to="/" @click.prevent="authStore.logout">Déconnexion</NuxtLink>
       </li>
     </ul>
   </nav>

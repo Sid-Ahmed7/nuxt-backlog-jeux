@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
-import { useGamesStore } from '@/stores/useGamesStore'
-import { useGameUtils } from '~/utils/useGameUtils'
+import type { Game } from '@/types/Game'
 import '@/assets/styles/games-recommendations.css'
 
-const gamesStore = useGamesStore()
+
+const props = defineProps<{
+  games: Game[]
+}>()
 const {getCoverUrl, formatReleaseDate} = useGameUtils()
 
+
+
 const upComingGames = computed(() => {
-  return gamesStore.games
+  return props.games
     .filter((game) => game.first_release_date && game.first_release_date > Math.floor(Date.now() / 1000))
     .sort((a, b) => (a.first_release_date ?? 0) - (b.first_release_date ?? 0))
     .slice(0, 5)

@@ -1,39 +1,35 @@
 <script setup lang="ts">
-import { useGamesStore } from '@/stores/useGamesStore'
-import { useGenresStore } from '@/stores/useGenresStore'
-import { usePlatformsStore } from '@/stores/usePlatformsStore'
-import { useThemeStore } from '@/stores/useThemeStore'
-import { useGamesModesStore } from '@/stores/useGamesModesStore'
+
 import BacklogTrack from '@/components/Home/BacklogTrack.vue'
 import UpcomingGames from '@/components/Home/UpComingGames.vue'
 import LastOuting from '@/components/Home/LastOuting.vue'
 import RatingGames from '@/components/Home/RatingGames.vue'
 
-const gamesStore = useGamesStore()
 const genresStore = useGenresStore()
 const platformsStore = usePlatformsStore()
 const themesStore = useThemeStore()
 const gameModesStore = useGamesModesStore()
+const {transformGameData} = useGameUtils()
+
+const {data: gameData, error: gameError} = await useAsyncData('games', () => 
+  $fetch('/api/games').then(data => data.map(transformGameData)))
+
+  const games = computed(() => gameData.value ?? [])
 
 onMounted(async () => {
-  await gamesStore.fetchGames()
   await platformsStore.fetchPlatforms()
   await genresStore.fetchGenres()
   await themesStore.fetchThemes()
   await gameModesStore.fetchGamesModes()
-  console.log('Games:', gamesStore.games)
 })
-
-
-
 </script>
 
 <template>
     <BacklogTrack />
     <section class="game-recommendations">
-      <UpcomingGames />
-      <LastOuting />
-      <RatingGames />
+      <UpcomingGames :games="games" />
+      <LastOuting :games="games" />
+      <RatingGames :games="games" />
     </section>
 </template>
 

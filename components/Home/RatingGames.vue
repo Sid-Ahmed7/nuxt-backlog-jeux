@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useGamesStore } from '@/stores/useGamesStore'
-import { useGameUtils } from '~/utils/useGameUtils'
+import type { Game } from '@/types/Game'
 import '@/assets/styles/games-recommendations.css'
 
+const props = defineProps<{
+  games: Game[]
+}>()
 
-const gamesStore = useGamesStore()
 const { getCoverUrl, formatRating } = useGameUtils()
 
 const topRatedGames = computed(() => {
-  if (!Array.isArray(gamesStore.games)) {
+  if (!Array.isArray(props.games)) {
     return [] 
   }
 
-  const topRated = gamesStore.games.filter((game) => {
+  const topRated = props.games.filter((game) => {
     return game.total_rating_count
   })
 

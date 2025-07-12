@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { useGameUtils } from '~/utils/useGameUtils';
-import { useUserGamesStore } from '@/stores/useUserGamesStore';
+
 import type { UserGame } from '@/types/UserGame';
 import TimeModal from '@/components/Games/TimeModal.vue';
-import { GameStatus } from '~/types/enums';
+import { GameStatus } from '@/types/enums';
 
 const { getCoverUrl } = useGameUtils()
 const userGamesStore = useUserGamesStore();
