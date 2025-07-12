@@ -1,27 +1,29 @@
 <script setup lang="ts">
+const authStore = useAuthStore();
+const router = useRouter();
 
-const authStore = useAuthStore()
-const router = useRouter()
-
-const isOpen = ref(false)
-
+const isOpen = ref(false);
 
 const toggleMenu = () => {
-  isOpen.value = !isOpen.value
-}
+  isOpen.value = !isOpen.value;
+};
 
 const logout = async () => {
-  await authStore.logout()
-  router.push('/login')
-}
-
+  await authStore.logout();
+  router.push("/login");
+};
 </script>
 
 <template>
   <nav class="nav">
     <div class="logo-container">
       <NuxtLink to="/">
-        <img src="../assets/images/logo.png" alt="Logo" id="logo" />
+        <img
+          src="../assets/images/logo.png"
+          alt="Logo"
+          id="logo"
+          width="64px"
+        />
       </NuxtLink>
     </div>
 
@@ -46,11 +48,13 @@ const logout = async () => {
       <li v-if="authStore.user">
         <NuxtLink to="/profile">Profil</NuxtLink>
       </li>
-            <li>
+      <li>
         <NuxtLink to="/a-propos">À propos</NuxtLink>
       </li>
       <li v-if="authStore.user">
-        <NuxtLink to="/" @click.prevent="authStore.logout">Déconnexion</NuxtLink>
+        <NuxtLink to="/" @click.prevent="authStore.logout"
+          >Déconnexion</NuxtLink
+        >
       </li>
     </ul>
   </nav>
@@ -110,7 +114,7 @@ const logout = async () => {
 
 .menu-button::before,
 .menu-button::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 2rem;
   height: 0.25rem;
@@ -144,18 +148,14 @@ const logout = async () => {
     z-index: 9;
     opacity: 0;
     visibility: hidden;
-    transition:
-      opacity 0.3s ease,
-      visibility 0s 0.3s;
+    transition: opacity 0.3s ease, visibility 0s 0.3s;
   }
 
   .menu.menu-open {
     display: block;
     opacity: 1;
     visibility: visible;
-    transition:
-      opacity 0.3s ease,
-      visibility 0s 0s;
+    transition: opacity 0.3s ease, visibility 0s 0s;
   }
   .menu > li {
     width: 88%;
