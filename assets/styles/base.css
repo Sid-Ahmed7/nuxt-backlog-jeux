@@ -4,8 +4,10 @@
   --color-main: #9d4edd;
   --color-background: #171515;
   --color-card: #292729;
+  --color-small-card: #2c2c2c;
   --color-input: #171515;
   --color-border: #858585;
+  --color-text-secondary: #b0b0b0;
   --font-family-main: 'Inter', sans-serif;
   
   /* Couleurs supplémentaires pour cohérence */
@@ -35,8 +37,4 @@
     background: var(--background-color);
     line-height: 1.6;
     font-size: 15px;
-  }
-  
-  p {
-    font-size: var(--font-size-main);
   }
