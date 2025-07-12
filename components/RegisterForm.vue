@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { NuxtLink } from '#components';
 import type { RegisterData } from '@/types/RegisterData';
 
 const router = useRouter();

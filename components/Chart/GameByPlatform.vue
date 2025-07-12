@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import {computed} from 'vue';
 import { Doughnut } from 'vue-chartjs';
 import { ArcElement, CategoryScale, Chart, Legend, Title, Tooltip, type ChartOptions  } from 'chart.js';
-import type { UserGame } from '~/types/UserGame';
+import type { UserGame } from '@/types/UserGame';
 
 Chart.register(Title, Tooltip, Legend, CategoryScale, ArcElement)
 

@@ -1,27 +1,31 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useGamesStore } from '@/stores/useGamesStore';
-import { useUserGamesStore } from '@/stores/useUserGamesStore'
-import { useAuthStore } from '@/stores/useAuthStore'
-import { useGameUtils } from '~/utils/useGameUtils';
 import type { Game } from '@/types/Game';
 import PlatformSelectModal from '@/components/Games/PlatformSelectModal.vue';
 import GameScreenshot from '@/components/Games/GameScreenshot.vue';
 import GameComments from '@/components/Games/GameComments.vue';
 
-const gamesStore = useGamesStore();
 const userGamesStore = useUserGamesStore();
 const authStore = useAuthStore()
-const { getCoverUrl, getArtworkUrl, getScreenshotUrl, formatReleaseDate, formatRating } = useGameUtils();
+const { getCoverUrl, getArtworkUrl, getScreenshotUrl, formatReleaseDate, transformGameData } = useGameUtils();
 
 const route = useRoute();
 const router = useRouter();
 
-const game = ref<Game | null>(null);
 const showPlatformModal = ref(false);
 const showLightbox = ref(false)
 const currentIndex = ref(0)
+const gameSlug = route.params.slug as string;
+
+const {data: gameData, error} = useAsyncData('game', ( ) =>
+  $fetch<Game[]>(`/api/game/${gameSlug}`).then(data =>{
+    const transformedData = data.map(transformGameData)
+    return transformedData[0] || null;
+  })
+); 
+
+const game = computed(() => gameData.value ?? null);
+
 
 const addToUserList = () => {
   if( game.value !== null && game.value.platforms && game.value.platforms.length > 0) {
@@ -73,13 +77,6 @@ const openLightbox = () => {
 const closeLightBox =() => {
   showLightbox.value = false
 }
-  const gameSlug = route.params.slug as string;
-  const fetchedGame = gamesStore.games.find((game) => game.slug === gameSlug);
-  if (fetchedGame) {
-    game.value = fetchedGame;
-  } else {
-    router.push('/404');
-  }
 
 onMounted( () => {
 console.log(route.params.slug)

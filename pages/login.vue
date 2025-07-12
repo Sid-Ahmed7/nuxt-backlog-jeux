@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Database } from '../supabase'
-import { useAuthStore } from '@/stores/useAuthStore';
 
 const supabase = useSupabaseClient<Database>()
 const router = useRouter();

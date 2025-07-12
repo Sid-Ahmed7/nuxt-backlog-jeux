@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {useAuthStore} from '@/stores/useAuthStore'
+
 import  type { Database } from '@/supabase'
-import type { UserComment } from '~/types/UserComment';
+import type { UserComment } from '@/types/UserComment';
 
 
 const props = defineProps<{

@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { useGamesStore } from '@/stores/useGamesStore'
-import { useGameUtils } from '~/utils/useGameUtils'
-import defaultCover from '@/assets/images/default_cover.png'
+import type { Game } from '@/types/Game'
 import '@/assets/styles/games-recommendations.css'
 
+const props = defineProps<{
+  games: Game[]
+}>()
 
-const gamesStore = useGamesStore()
 const {getCoverUrl, formatReleaseDate} = useGameUtils()
 
 const lastOutingGames = computed(() => {
-  const lastOuting = gamesStore.games.filter((game) => {
+  const lastOuting = props.games.filter((game) => {
     const releaseDate = game.first_release_date
     return releaseDate && releaseDate < Math.floor(Date.now() / 1000)
   })

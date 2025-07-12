@@ -1,23 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useGamesStore } from '@/stores/useGamesStore'
-import { useGenresStore } from '@/stores/useGenresStore'
-import { usePlatformsStore } from '@/stores/usePlatformsStore'
-import { useThemeStore } from '@/stores/useThemeStore'
-import { useGamesModesStore } from '@/stores/useGamesModesStore'
-import { useGameFilters } from '@/composables/useGameFilters'
+
 import GamesList from '@/components/Games/GameList.vue'
 import GameFilters from '@/components/Games/GameFilters.vue'
 import SearchBar from '~/components/SearchBar.vue'
 import Pagination from '@/components/Pagination.vue'
 
-
-
 const genresStore = useGenresStore()
 const platformsStore = usePlatformsStore()
 const themesStore = useThemeStore()
 const gameModesStore = useGamesModesStore()
-const { selectedGenres,
+const { gameData, fetchError } = await useGames()
+
+const { 
+  selectedGenres,
   selectedPlatforms,
   selectedGameModes,
   selectedThemes,
@@ -25,29 +20,30 @@ const { selectedGenres,
   filteredGames,
   paginatedGames,
   currentPage,
+  games,
   totalPages,
   noResults,
   onSearch,
   gamesPerPage,
-  gamesStore,
   error } = useGameFilters()
 
 const showFilters = ref(false)
-onMounted(async () => {
-  await gamesStore.fetchGames()
-  await platformsStore.fetchPlatforms()
-  await genresStore.fetchGenres()
-  await themesStore.fetchThemes()
-  await gameModesStore.fetchGamesModes()
-  console.log('Games:', gamesStore.games)
-})
+
+watch(() => gameData, (newGames) => {
+  games.value = newGames ?? []
+}, { immediate: true })
+
 
 watch(showFilters, (open) => {
   document.body.style.overflow = open ? 'hidden' : ''
 })
 
-
-
+onMounted(async () => {
+  await platformsStore.fetchPlatforms()
+  await genresStore.fetchGenres()
+  await themesStore.fetchThemes()
+  await gameModesStore.fetchGamesModes()
+})
 </script>
 
 <template>

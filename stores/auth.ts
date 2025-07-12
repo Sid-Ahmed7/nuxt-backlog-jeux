@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { ref, watch } from "vue";
 import type { User } from "@/types/AuthUser";
 import type { Database } from "@/supabase";
 import type { RegisterData } from "~/types/RegisterData";

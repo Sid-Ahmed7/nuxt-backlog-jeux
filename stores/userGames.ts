@@ -3,12 +3,19 @@ import type { Game } from '@/types/Game'
 import type { UserGame } from '~/types/UserGame'
 import  type { Database } from '@/supabase'
 import { GameStatus } from '~/types/enums'
+import GameList from '~/components/Games/GameList.vue'
+import type { User } from '~/types/AuthUser'
 
 
 
 export const useUserGamesStore = defineStore('userGames', () => {
-    const userGames = ref<UserGame[]>([])
+  
     const supabase = useSupabaseClient<Database>()
+    const userGames = ref<UserGame[]>([])
+
+    const setGames = (games: UserGame[]) => {
+        userGames.value = games
+    }
 
     const fetchUserGames = async (userId :string) => {
         const {data, error } = await supabase
@@ -19,41 +26,11 @@ export const useUserGamesStore = defineStore('userGames', () => {
         if(error) {
             return 
         }
-
-        console.log('DB',data)
-
-        const gamesFromIgdb = await Promise.all(
-            data.map(async (game: any ) => {
-                 console.log('Raw status from DB entry:', game.status)
-                try {
-                    const gamesList = await $fetch<Game[]>(`/api/game/${game.id_game}`)
-                    const gameData = gamesList[0]
-                    console.log('Game Data',gameData)
-
-                    return {
-                         game: {
-                            id: game.id_game,
-                            name: gameData.name,
-                            cover: gameData.cover ? { id: gameData.cover.id, image_id: gameData.cover.image_id } : undefined,
-                        },
-                        platform_choose: game.platform_choose ?? game.platform_name,
-                        status: game.status ?? GameStatus.NotStarted,
-                        started_at: game.started_at ?? undefined,
-                        ended_at: game.ended_at ?? undefined,
-                        timeSpent: game.timeSpent ?? undefined,
-                    } as UserGame
-                    
-                } catch (err) {
-                    return
-                }
-            })
-        )
-        userGames.value = gamesFromIgdb.filter(g => g !== undefined)
-        console.log(userGames.value)
+        userGames.value = data as any
     }
 
     const addGameInUserList = async (game:Game, platformName: string) => {
- 
+
         const {data : {user}} = await supabase.auth.getUser()
         if(!user) {
             return
@@ -67,7 +44,6 @@ export const useUserGamesStore = defineStore('userGames', () => {
                 status: GameStatus.NotStarted
             }
         ])
-
 
             userGames.value.push({
                 game,
@@ -161,5 +137,5 @@ export const useUserGamesStore = defineStore('userGames', () => {
 
 
 
-    return { userGames, addGameInUserList, removeGameInUserList, updateStatus,fetchUserGames, updateGameTime}
+    return { userGames,setGames, addGameInUserList, removeGameInUserList, updateStatus,fetchUserGames, updateGameTime}
 })  
