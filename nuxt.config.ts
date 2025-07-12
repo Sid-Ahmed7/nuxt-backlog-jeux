@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  modules: ["@pinia/nuxt", "@nuxtjs/supabase"],
+  modules: ["@pinia/nuxt", "@nuxtjs/supabase", "@nuxt/test-utils/module"],
 
   runtimeConfig: {
     api: {

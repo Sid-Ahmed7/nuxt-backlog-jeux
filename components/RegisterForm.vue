@@ -113,7 +113,7 @@ const registerUser = async () => {
             placeholder="Mot de passe"
             v-model="registerForm.password"
             required
-            minlength="8"
+            minlength="6"
           />
         </div>
 
