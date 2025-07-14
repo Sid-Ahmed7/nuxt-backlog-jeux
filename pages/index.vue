@@ -1,20 +1,61 @@
 <script setup lang="ts">
 
 import BacklogTrack from '@/components/Home/BacklogTrack.vue'
-import UpcomingGames from '@/components/Home/UpComingGames.vue'
-import LastOuting from '@/components/Home/LastOuting.vue'
-import RatingGames from '@/components/Home/RatingGames.vue'
+import GameListHome from '~/components/Home/GameListHome.vue'
 
 const genresStore = useGenresStore()
 const platformsStore = usePlatformsStore()
 const themesStore = useThemeStore()
 const gameModesStore = useGamesModesStore()
-const {transformGameData} = useGameUtils()
+const {transformGameData,formatReleaseDate,formatRating} = useGameUtils()
 
 const {data: gameData, error: gameError} = await useAsyncData('games', () => 
   $fetch('/api/games').then(data => data.map(transformGameData)))
 
   const games = computed(() => gameData.value ?? [])
+
+  const upComingGames = computed(() => {
+  return games.value
+    .filter(
+      (game) =>
+        game.first_release_date &&
+        game.first_release_date > Math.floor(Date.now() / 1000)
+    )
+    .sort((a, b) => (a.first_release_date ?? 0) - (b.first_release_date ?? 0))
+    .slice(0, 5);
+});
+
+const lastOutingGames = computed(() => {
+  const lastOuting = games.value.filter((game) => {
+    const releaseDate = game.first_release_date;
+    return releaseDate && releaseDate < Math.floor(Date.now() / 1000);
+  });
+
+  return lastOuting
+    .sort((first, second) => {
+      const firstReleaseDate = first.first_release_date || 0;
+      const secondReleaseDate = second.first_release_date || 0;
+      return secondReleaseDate - firstReleaseDate;
+    })
+    .slice(0, 5);
+});
+
+const topRatedGames = computed(() => {
+  if (!Array.isArray(games.value)) {
+    return [];
+  }
+
+  const topRated = games.value.filter((game) => {
+    return game.total_rating_count;
+  });
+
+  return topRated
+    .sort((a, b) => {
+      return (b.total_rating_count ?? 0) - (a.total_rating_count ?? 0);
+    })
+    .slice(0, 5);
+});
+
 
 onMounted(async () => {
   await platformsStore.fetchPlatforms()
@@ -25,41 +66,43 @@ onMounted(async () => {
 </script>
 
 <template>
+
     <BacklogTrack />
-    <section class="game-recommendations">
-      <UpcomingGames :games="games" />
-      <LastOuting :games="games" />
-      <RatingGames :games="games" />
+       <section 
+      class="
+        flex flex-col gap-4 w-[95%] mx-auto py-6 max-w-full
+        md:w-[90%] md:gap-6
+        lg:flex-row lg:justify-between lg:gap-8 lg:w-4/5 lg:py-8
+      "
+    >
+    <GameListHome :games="upComingGames" title="Jeux à venir" >
+      <template #links>
+        <NuxtLink to="/catalogue-de-jeu/prochaine-sortie" class="text-main hover:text-main-hover hover:underline">
+          Voir plus
+        </NuxtLink>
+      </template>
+
+      <template #extra-info="{game}">
+        <p class="text-sm text-text-secondary mb-1">
+          {{ formatReleaseDate(game.first_release_date) }}
+        </p>
+      </template>
+    </GameListHome>
+
+     <GameListHome :games="lastOutingGames" title="Dernière sortie" >
+      <template #extra-info="{game}">
+        <p class="text-sm text-text-secondary mb-1">
+          {{ formatReleaseDate(game.first_release_date) }}
+        </p>
+      </template>   
+    </GameListHome>
+
+    <GameListHome :games="topRatedGames" title="Dernière sortie" >
+      <template #extra-info="{game}">
+        <p class="text-sm text-text-secondary mb-1">
+          {{ formatRating(game.total_rating_count) }}
+        </p>
+      </template>   
+    </GameListHome>
     </section>
 </template>
-
-<style scoped lang="css">
-
-.game-recommendations {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 2rem;
-  width: 80%;
-  margin: 0 auto;
-  padding: 2rem 0;
-  max-width: 100%;
-}
-
-@media screen and (max-width: 1024px) {
-  .game-recommendations {
-    flex-direction: column;
-    align-items: center;
-    width: 90%;
-    gap: 1.5rem;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .game-recommendations {
-    width: 95%;
-    padding: 1.5rem 0;
-    gap: 1rem;
-  }
-}
-</style>

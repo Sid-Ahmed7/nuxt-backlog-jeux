@@ -15,7 +15,17 @@ const successMessage = ref<string>("");
 const isSubmitting = ref<boolean>(false);
 
 const validateForm = (): boolean => {
-  if (
+
+
+  if(!registerForm.value.username &&
+     !registerForm.value.email &&
+     !registerForm.value.password &&
+     !registerForm.value.confirmPassword
+    ) {
+      errorMessage.value = "Veuillez remplir tous les champ";
+      return false
+    }  
+   else if (
     !registerForm.value.username ||
     registerForm.value.username.length < 3 ||
     registerForm.value.username.length > 15
@@ -24,22 +34,24 @@ const validateForm = (): boolean => {
       "Le nom d'utilisateur doit comporter entre 3 et 15 caractères.";
     return false;
   }
-  if (!registerForm.value.email) {
+  else if (!registerForm.value.email) {
     errorMessage.value = "L'email est invalide.";
     return false;
   }
 
-  if (!registerForm.value.password || registerForm.value.password.length < 6) {
+  else if (!registerForm.value.password || registerForm.value.password.length < 6) {
     errorMessage.value =
       "Le mot de passe doit comporter au moins 6 caractères.";
     return false;
   }
-  if (registerForm.value.password !== registerForm.value.confirmPassword) {
+  else if (registerForm.value.password !== registerForm.value.confirmPassword) {
     errorMessage.value = "Les mots de passe ne correspondent pas.";
     return false;
-  }
+  } else {
   errorMessage.value = "";
   return true;
+  }
+
 };
 
 const registerUser = async () => {

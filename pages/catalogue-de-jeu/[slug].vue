@@ -4,6 +4,9 @@ import type { Game } from '@/types/Game';
 import PlatformSelectModal from '@/components/Games/PlatformSelectModal.vue';
 import GameScreenshot from '@/components/Games/GameScreenshot.vue';
 import GameComments from '@/components/Games/GameComments.vue';
+import GameHeader from '~/components/Games/GameHeader.vue';
+import GameInfo from '~/components/Games/GameInfo.vue';
+import RelatedGamesSection from '~/components/Games/RelatedGamesSection.vue';
 
 const userGamesStore = useUserGamesStore();
 const authStore = useAuthStore()
@@ -85,40 +88,18 @@ console.log(route.params.slug)
 </script>
 
 <template>
-  <div class="game-header" :style="{'background-image': `url(${getArtworkUrl(game?.artworks?.[0]?.image_id)})`}">
-    <img :src="getCoverUrl(game?.cover?.image_id)" alt="Cover" />
-    <div class="game-info">
-      <h1>{{ game?.name }}</h1>
-      <div class="badges">
-        <span v-for="genre in game?.genres || []" :key="genre.id">{{ genre.name }}</span>
-        <span v-for="mode in game?.game_modes || []" :key="mode.id">{{ mode.name }}</span>
-        <span v-for="theme in game?.themes || []" :key="theme.id">{{ theme.name }}</span>
-      </div>
-    </div>
-  </div>
+
+  <GameHeader :game="game" />
+
 
   <div v-if="authStore.user"  class="action-buttons">
     <button class="btn primary" v-if="!isGameIsAdd" @click="addToUserList">Ajouter à ma liste</button>
     <button class="btn primary" v-else @click="removeFromUserList">Retirer de ma liste</button>
   </div>
 
-  <div class="info-grid">
-    <div class="info-card">Sortie : {{ formatReleaseDate(game?.first_release_date) }}</div>
-    <div class="info-card">Plateformes : {{ game?.platforms?.map(p => p.name).join(', ') }}</div>
-    <div class="info-card">Genres : {{ game?.genres?.map(g => g.name).join(', ') }}</div>
-  </div>
+  <GameInfo :game="game" />
 
-  <div class="game-description">
-    {{ game?.summary || "Pas de description disponible." }}
-  </div>
-
-  <PlatformSelectModal 
-    v-if="showPlatformModal" 
-    :game="game" 
-    @close="showPlatformModal = false" 
-    @select="handlePlatformSelect" 
-  /> 
-  
+ 
   <div v-if="game?.screenshots?.length" class="extra-info screenshots-section">
     <h3>Captures d'écran de {{ game.name }}</h3>
     
@@ -159,88 +140,23 @@ console.log(route.params.slug)
   />
   <GameComments :gameId="game?.id" />
 
-  <div v-if="game?.expanded_games?.length" class="extra-info expanded-games">
-    <h3>Extensions du jeu</h3>
-    <ul>
-      <li v-for="expanded in game.expanded_games" :key="expanded.id">
-        <NuxtLink :to="`/catalogue-de-jeu/${expanded?.slug || 'jeu-inconnu'}`">
-        <img :src="getCoverUrl(expanded.cover?.image_id)" alt="extensions" class="expanded-cover" />
-      </NuxtLink>
-        <span>{{ expanded.name }}</span>
-      </li>
-    </ul>
-  </div>
-  
-  <div v-if="game?.dlcs?.length" class="extra-info dlcs">
-    <h3>DLCs</h3>
-    <ul>
-      <li v-for="dlc in game.dlcs" :key="dlc.id">
-        <NuxtLink :to="`/catalogue-de-jeu/${dlc?.slug || 'inconnu'}`">
-        <img :src="getCoverUrl(dlc.cover?.image_id)" alt="DLC" class="dlc-cover" />
-      </NuxtLink>
-        <span>{{ dlc.name }}</span>
-      </li>
-    </ul>
-  </div>
-  
-  <div v-if="game?.similar_games?.length" class="extra-info similar-games">
-    <h3>Jeux similaires</h3>
-    <ul>
-      <li v-for="similar in game.similar_games" :key="similar.id">
-   <NuxtLink :to="`/catalogue-de-jeu/${similar?.slug || 'Jeu inconnu'}`">
 
-        <img :src="getCoverUrl(similar.cover?.image_id)" alt="jeux similaires" class="similar-cover" />
-      </NuxtLink>
-        <span>{{ similar.name }}</span>
-      </li>
-    </ul>
-  </div>
 
+  <RelatedGamesSection :extra-games="game?.expanded_games" title="Extensions du jeu" />
+  <RelatedGamesSection :extra-games="game?.dlcs" title="DLCs" />
+  <RelatedGamesSection :extra-games="game?.similar_games" title="Jeux similaires" />
+
+ 
+  <PlatformSelectModal 
+    v-if="showPlatformModal" 
+    :game="game" 
+    @close="showPlatformModal = false" 
+    @select="handlePlatformSelect" 
+  />
 
 </template>
 
 <style scoped>
-.game-header {
-  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9));
-  padding: 3.75rem 1.875rem;
-  display: flex;
-  align-items: center;
-  gap: 2.5rem;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-}
-
-.game-header img {
-  height: 13.75rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 0 0.625rem rgba(0,0,0,0.6);
-  z-index: 2; 
-}
-
-.game-info h1 {
-  font-size: 2.8rem;
-  margin-bottom: 0.625rem;
-}
-
-.badges span {
-  display: inline-block;
-  background: linear-gradient(135deg, #6a1b9a, #8e24aa);
-  box-shadow: 0 0 0.5rem #8e24aa88;
-  border-radius: 3.125rem;
-  padding: 0.3125rem 0.9375rem;
-  margin-right: 0.625rem;
-  font-size: 0.85rem;
-  font-weight: bold;
-  color: white;
-}
-
-.info-grid {
-  display: flex;
-  gap: 1.25rem;
-  padding: 1.25rem 1.875rem;
-  flex-wrap: wrap;
-}
 
 .action-buttons {
   display: flex;
@@ -277,87 +193,7 @@ console.log(route.params.slug)
   background-color: #8e24aa;
   color: white;
 }
-.info-card {
-  background-color: #2c2c2c;
-  padding: 0.9375rem 1.25rem;
-  border-radius: 0.75rem;
-  font-weight: 500;
-  flex: 1 1 11.25rem;
-  color: white;
-}
 
-.game-description {
-  background: #141414;
-  border-left: 0.3125rem solid #8e24aa;
-  padding: 1.5625rem 1.875rem;
-  font-style: italic;
-  line-height: 1.6;
-  margin: 1.25rem 1.875rem;
-  color: white;
-}
-
-.extra-info {
-  padding: 1.25rem 1.875rem;
-  margin-bottom: 1.25rem;
-}
-.extra-info {
-  margin: 30px 0;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.extra-info h3 {
-  margin-bottom: 15px;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: white;
-  border-bottom: 2px solid #8e24aa;
-  padding-bottom: 8px;
-}
-
-.extra-info ul {
-  list-style: none;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 20px;
-}
-
-.extra-info li {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform 0.2s ease;
-}
-
-.extra-info li:hover {
-  transform: translateY(-5px);
-}
-
-.expanded-cover,
-.dlc-cover,
-.similar-cover {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 3/4;
-  object-fit: cover;
-  border-radius: 6px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 8px;
-}
-
-.extra-info span {
-  text-align: center;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #8e24aa;
-  line-height: 1.2;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
 
 .screenshots-section {
   max-width: 58.75rem;
