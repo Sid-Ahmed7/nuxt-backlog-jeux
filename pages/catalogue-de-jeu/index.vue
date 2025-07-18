@@ -1,23 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useGamesStore } from '@/stores/useGamesStore'
-import { useGenresStore } from '@/stores/useGenresStore'
-import { usePlatformsStore } from '@/stores/usePlatformsStore'
-import { useThemeStore } from '@/stores/useThemeStore'
-import { useGamesModesStore } from '@/stores/useGamesModesStore'
-import { useGameFilters } from '@/composables/useGameFilters'
+
 import GamesList from '@/components/Games/GameList.vue'
 import GameFilters from '@/components/Games/GameFilters.vue'
 import SearchBar from '~/components/SearchBar.vue'
 import Pagination from '@/components/Pagination.vue'
 
-
-
 const genresStore = useGenresStore()
 const platformsStore = usePlatformsStore()
 const themesStore = useThemeStore()
 const gameModesStore = useGamesModesStore()
-const { selectedGenres,
+const { gameData } = await useGames()
+
+const { 
+  selectedGenres,
   selectedPlatforms,
   selectedGameModes,
   selectedThemes,
@@ -25,189 +20,69 @@ const { selectedGenres,
   filteredGames,
   paginatedGames,
   currentPage,
+  games,
   totalPages,
   noResults,
   onSearch,
   gamesPerPage,
-  gamesStore,
   error } = useGameFilters()
 
 const showFilters = ref(false)
-onMounted(async () => {
-  await gamesStore.fetchGames()
-  await platformsStore.fetchPlatforms()
-  await genresStore.fetchGenres()
-  await themesStore.fetchThemes()
-  await gameModesStore.fetchGamesModes()
-  console.log('Games:', gamesStore.games)
-})
+
+watch(() => gameData, (newGames) => {
+  games.value = newGames ?? []
+}, { immediate: true })
+
 
 watch(showFilters, (open) => {
   document.body.style.overflow = open ? 'hidden' : ''
 })
 
-
-
+onMounted(async () => {
+  await platformsStore.fetchPlatforms()
+  await genresStore.fetchGenres()
+  await themesStore.fetchThemes()
+  await gameModesStore.fetchGamesModes()
+})
 </script>
 
 <template>
-  <div class="catalogue-view">
-    <div class="header">
-      <h1 class="catalogue-title">Catalogue des jeux</h1>
-      <div class="search-bar">
+  <div class="px-4 py-8 max-w-screen-xl mx-auto flex flex-col items-center">
+    <div class="w-full mb-10 text-center">
+      <h1 class="text-4xl font-bold text-main mb-6 ">Catalogue des jeux</h1>
+      <div class="flex justify-center gap-10 mb-6 w-full">
         <SearchBar @search="onSearch" />
       </div>
     </div>
 
-    <button class="toggle-filters" @click="showFilters = !showFilters">
+    <button class="bg-main text-white px-4 py-2 rounded mb-6 " @click="showFilters = !showFilters">
       {{ showFilters ? 'Masquer les filtres' : 'Afficher les filtres' }}
     </button>
 
-    <div v-if="showFilters" class="overlay" @click="showFilters = false"></div>
+    <div v-if="showFilters" class="fixed inset-0 bg-opacity-50 z-50" @click="showFilters = false"></div>
 
-    <div class="content">
-      <div class="filters" :class="{ 'filters-visible': showFilters }">
+    <div class="flex w-full relative gap-8">
+         <div
+        class="bg-[#2d3a3f] text-white p-8 flex flex-col gap-6 fixed top-0 left-0 h-screen w-72 z-[1001] transition-all duration-300"
+        :class="{ '-translate-x-full opacity-0': !showFilters, 'translate-x-0 opacity-100': showFilters }"
+      >
         <GameFilters :platforms="platformsStore.platforms" :genres="genresStore.genres" :themes="themesStore.themes"
           :gameModes="gameModesStore.gamesModes" v-model:selectedGenre="selectedGenres"
           v-model:selectedPlatforms="selectedPlatforms" v-model:selectedGameMode="selectedGameModes"
           v-model:selectedTheme="selectedThemes" />
       </div>
+      <div class="flex-1">
 
-      <div v-if="error" class="error">{{ error }}</div>
+      <div v-if="error" class="text-red-500 text-center">{{ error }}</div>
 
-      <div v-else-if="noResults" class="no-results">
-        <h2>Aucun résultat trouvé</h2>
+      <div v-else-if="noResults">
+        <h2 class="text-xl text-main text-center mt-8">Aucun résultat trouvé</h2>
       </div>
-      <section v-else class="games-section">
+      <div v-else class="w-full">
         <GamesList :games="paginatedGames" :error="error" />
-        <div class="pagination">
           <Pagination :currentPage="currentPage" :totalPages="totalPages" @update:currentPage="currentPage = $event" />
-        </div>
-      </section>
-
+      </div>
+    </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.catalogue-view {
-  padding: 2rem 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.catalogue-title {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: var(--main-color);
-  margin-bottom: 2.5rem;
-  text-align: center;
-  width: 100%;
-}
-
-.search-bar {
-  display: flex;
-  justify-content: center;
-  gap: 2.5rem;
-  margin-bottom: 2rem;
-  width: 100%;
-}
-
-.toggle-filters {
-  background-color: var(--main-color);
-  color: white;
-  border: none;
-  padding: 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  border-radius: 0.5rem;
-  margin-bottom: 2rem;
-}
-
-.content {
-  display: flex;
-  width: 100%;
-  max-width: 1200px;
-  gap: 2rem;
-  position: relative;
-}
-
-.filters {
-  background-color: #2d3a3f;
-  padding: 2rem;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 300px;
-  transform: translateX(-120%);
-  opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  z-index: 1001;
-}
-
-.filters-visible {
-  transform: translateX(0);
-  opacity: 1;
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-}
-
-.games-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.games-section {
-  width: 100%;
-}
-
-.no-results {
-  text-align: center;
-  font-size: 1.5rem;
-  color: var(--color-primary);
-  margin-top: 2rem;
-  width: 100%;
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 1.5rem;
-  width: 100%;
-}
-
-.pagination button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  margin: 0 5px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.pagination button:hover {
-  background-color: #0056b3;
-}
-
-.pagination button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-</style>

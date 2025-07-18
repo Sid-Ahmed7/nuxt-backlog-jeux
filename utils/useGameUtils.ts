@@ -1,5 +1,8 @@
 import defaultCover from '@/assets/images/default_cover.png'
 import defaultBanner from '@/assets/images/default_banner.png'
+import type { Game } from '@/types/Game'
+import type { UserGame } from '~/types/UserGame'
+import { GameStatus } from '~/types/enums'
 
 export function useGameUtils() {
   const getCoverUrl = (cover: string | undefined): string => {
@@ -33,5 +36,50 @@ export function useGameUtils() {
     return 'Pas de note'
   }
 
-  return { getCoverUrl, getArtworkUrl, getScreenshotUrl, getLogoUrl,formatReleaseDate, formatRating }
+  const transformGameData = (game: any): Game => {
+    return {
+    id: game.id,
+              name: game.name,
+              cover: game.cover ? { id: game.cover.id, image_id: game.cover.image_id } : undefined,
+              slug: game.slug || '',
+              summary: game.summary,
+              genres: game.genres || [],
+              involved_companies: game.involved_companies || [],
+              first_release_date: game.first_release_date || 0,
+              artworks: game.artworks || [],
+              dlcs: game.dlcs || [],
+              similar_games: game.similar_games || [],
+              expanded_games: game.expanded_games || [],
+              expansions: game.expansions || [],
+              screenshots: game.screenshots || [],
+              game_modes: game.game_modes || [],
+              themes: game.themes || [],
+              total_rating_count: game.total_rating_count || 0,
+              platforms: game.platforms || [],
+              multiplayer_modes: game.multiplayer_modes || [],
+              videos: game.videos || [],
+              year: game.first_release_date
+                ? new Date(game.first_release_date * 1000).getFullYear()
+                : 0,
+  }
+}
+
+
+const transformUserGame = (userGameRecord: any , igdbGameData: any) :UserGame => {
+    
+    return {
+      game: {
+        id: igdbGameData.id,
+        name: igdbGameData.name,
+        cover: igdbGameData.cover ? {id: igdbGameData.cover.id, image_id: igdbGameData.cover.image_id} : undefined
+      },
+      platform_choose: userGameRecord.platform_choose ?? undefined,
+      status: userGameRecord.status ?? GameStatus.NotStarted,
+      started_at: userGameRecord.started_at ?? undefined,
+      ended_at: userGameRecord.ended_at ?? undefined,
+      timeSpent: userGameRecord.timeSpent ?? undefined
+    }
+}
+
+  return { getCoverUrl, getArtworkUrl, getScreenshotUrl, getLogoUrl,formatReleaseDate, formatRating, transformGameData, transformUserGame}
 }

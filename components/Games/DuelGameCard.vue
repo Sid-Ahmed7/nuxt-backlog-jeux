@@ -31,236 +31,50 @@ const releaseYear = computed(() => {
 
 <template>
   <div 
-    class="duel-game-card" 
-    :class="{ 
-      'clickable': isClickable, 
-      'winner': isWinner,
-      'has-cover': game.cover?.image_id 
+    class="bg-white/5 rounded-3xl overflow-hidden border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] backdrop-blur-md transition-all duration-300 relative max-w-sm min-h-[500px] flex flex-col"
+    :class="{
+      'cursor-pointer transform hover:scale-105 hover:shadow-[0_12px_40px_0_rgba(34,211,238,0.3)] hover:border-cyan-400': isClickable,
+      'border-yellow-400 shadow-[0_12px_40px_0_rgba(255,215,0,0.4)]': isWinner
     }"
     @click="handleClick"
   >
-    <div class="cover-container">
+    <div class="h-72 relative overflow-hidden">
       <img 
         v-if="game.cover?.image_id" 
         :src="getCoverUrl(game.cover.image_id)" 
         :alt="`Couverture de ${game.name}`"
-        class="cover"
+        class="w-full h-full object-cover transition-transform duration-300"
+        :class="{ 'hover:scale-110': isClickable }"
       />
-      <div v-else class="no-cover">
+      <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyan-400/10 to-blue-600/10 text-cyan-400 text-lg">
         <span>Pas d'image</span>
       </div>
     </div>
 
-    <div class="game-info">
-      <h3 class="game-title">{{ game.name }}</h3>
+    <div class="p-6 flex-1 flex flex-col gap-4">
+      <h3 class="text-cyan-400 text-xl font-bold leading-tight drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
+        {{ game.name }}
+      </h3>
       
-      <div class="game-details">
-        <p class="release-year">{{ releaseYear }}</p>
-        <p class="genres">{{ formattedGenres }}</p>
+      <div class="flex flex-col gap-2">
+        <p class="text-white text-base font-semibold">{{ releaseYear }}</p>
+        <p class="text-gray-400 text-sm leading-relaxed">{{ formattedGenres }}</p>
       </div>
 
-      <p v-if="game.summary" class="summary">
+      <p v-if="game.summary" class="text-gray-300 text-sm leading-relaxed flex-1">
         {{ game.summary.slice(0, 150) }}{{ game.summary.length > 150 ? '...' : '' }}
       </p>
 
-      <div v-if="isClickable" class="cta">
-        <span class="vote-text">Cliquez pour voter !</span>
+      <div v-if="isClickable" class="bg-cyan-400/10 border border-cyan-400 rounded-xl p-3 text-center mt-auto">
+        <span class="text-cyan-400 font-bold text-sm block mb-1">Cliquez pour voter !</span>
+        <div class="text-lg animate-bounce">👆</div>
       </div>
     </div>
 
-    <div v-if="isWinner" class="winner-overlay">
-      <div class="winner-badge">🏆 Gagnant !</div>
+    <div v-if="isWinner" class="absolute inset-0 bg-yellow-400/10 flex items-center justify-center backdrop-blur-sm">
+      <div class="bg-yellow-400 text-black px-8 py-4 rounded-full text-lg font-bold shadow-lg animate-pulse">
+        🏆 Gagnant !
+      </div>
     </div>
   </div>
-</template>
-
-<style scoped>
-.duel-game-card {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-  position: relative;
-  max-width: 400px;
-  min-height: 500px;
-  display: flex;
-  flex-direction: column;
-}
-
-.clickable {
-  cursor: pointer;
-  transform: scale(1);
-}
-
-.clickable:hover {
-  transform: scale(1.05);
-  box-shadow: 0 12px 40px 0 rgba(0, 255, 204, 0.3);
-  border-color: #00ffcc;
-}
-
-.winner {
-  border-color: #ffd700;
-  box-shadow: 0 12px 40px 0 rgba(255, 215, 0, 0.4);
-}
-
-.cover-container {
-  height: 300px;
-  position: relative;
-  overflow: hidden;
-}
-
-.cover {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.clickable:hover .cover {
-  transform: scale(1.1);
-}
-
-.no-cover {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, rgba(0, 255, 204, 0.1), rgba(0, 123, 255, 0.1));
-  color: #00ffcc;
-  font-size: 1.1rem;
-}
-
-.game-info {
-  padding: 1.5rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.game-title {
-  color: #00ffcc;
-  font-size: 1.4rem;
-  font-weight: bold;
-  margin: 0;
-  text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
-  line-height: 1.3;
-}
-
-.game-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.release-year {
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.genres {
-  color: #aaa;
-  font-size: 0.9rem;
-  margin: 0;
-  line-height: 1.4;
-}
-
-.summary {
-  color: #ddd;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  margin: 0;
-  flex: 1;
-}
-
-.cta {
-  background: rgba(0, 255, 204, 0.1);
-  border: 1px solid #00ffcc;
-  border-radius: 10px;
-  padding: 0.8rem;
-  text-align: center;
-  margin-top: auto;
-}
-
-.vote-text {
-  color: #00ffcc;
-  font-weight: bold;
-  font-size: 0.9rem;
-  display: block;
-  margin-bottom: 0.3rem;
-}
-
-
-
-.winner-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 215, 0, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(2px);
-}
-
-.winner-badge {
-  background: #ffd700;
-  color: #000;
-  padding: 1rem 2rem;
-  border-radius: 50px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.6);
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-10px);
-  }
-  60% {
-    transform: translateY(-5px);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@media (max-width: 768px) {
-  .duel-game-card {
-    max-width: 100%;
-    min-height: 450px;
-  }
-  
-  .cover-container {
-    height: 250px;
-  }
-  
-  .game-info {
-    padding: 1rem;
-  }
-  
-  .game-title {
-    font-size: 1.2rem;
-  }
-}</style> 
+  </template> 

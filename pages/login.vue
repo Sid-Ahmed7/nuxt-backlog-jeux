@@ -1,90 +1,58 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import type { Database } from '../supabase'
-import { useAuthStore } from '@/stores/useAuthStore';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import type { Database } from "../supabase";
+import { useAuthStore } from "../stores/auth";
 
-const supabase = useSupabaseClient<Database>()
+const supabase = useSupabaseClient<Database>();
 const router = useRouter();
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 
 const isSubmitting = ref(false);
 
-const handleSubmit = async ({email, password} : {email:string; password:string}) => {
+const handleSubmit = async ({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) => {
   isSubmitting.value = true;
-  await authStore.login(email, password)
+  await authStore.login(email, password);
 
-
-    const {  data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  });
 
   if (!authStore.error) {
-    router.push('/')
+    router.push("/");
   }
-  isSubmitting.value = false
-
-
- 
-    
-
-}
-
-  </script>
+  isSubmitting.value = false;
+};
+</script>
 
 <template>
-  <div class="container">
-    <div class="card">
-      <h2>Se connecter</h2>
+  <div class="flex justify-center items-center h-screen">
+    <div
+      class="flex flex-col justify-between gap-4 bg-card text-white rounded-4xl shadow-lg w-96 p-6"
+    >
+      <h2 class="text-center mb-6 text-2xl font-semibold text-text-primary">
+        Connexion
+      </h2>
+
       <LoginForm @submit="handleSubmit" />
-        <p v-if="authStore.error" class="error-message">{{ authStore.error }}</p>
-        <p class="switch">
-          Pas encore inscrit ? <NuxtLink to="/signup">S'inscrire</NuxtLink>
-        </p>
+      <p v-if="authStore.error" class="text-red-500 text-sm text-center mt-2">
+        {{ authStore.error }}
+      </p>
+      <p class="text-center mt-4 text-text-secondary">
+        Pas encore inscrit ?
+        <NuxtLink
+          to="/signup"
+          class="text-main hover:text-main-hover hover:underline"
+          >S'inscrire</NuxtLink
+        >
+      </p>
     </div>
   </div>
 </template>
-
-<style scoped>
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.card {
-  background: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 24px;
-  font-weight: 600;
-}
-
-
-
-.error-message {
-  color: red;
-  font-size: 14px;
-  text-align: center;
-}
-
-.switch {
-  text-align: center;
-  margin-top: 10px;
-}
-
-.switch a {
-  color: #007bff;
-  text-decoration: none;
-}
-</style>

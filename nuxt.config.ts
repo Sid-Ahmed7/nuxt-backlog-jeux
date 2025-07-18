@@ -1,9 +1,12 @@
+import tailwindcss from "@tailwindcss/vite";
+
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
-  modules: ['@pinia/nuxt', '@nuxtjs/supabase'],
-
-
+  vite: {
+    plugins: [tailwindcss()],
+  },
+  modules: ["@pinia/nuxt", "@nuxtjs/supabase"],
 
   runtimeConfig: {
     api: {
@@ -17,15 +20,22 @@ export default defineNuxtConfig({
         key: process.env.SUPABASE_KEY,
         redirect: false,
         redirectOptions: {
-          login: '/login',
-          callback: '/',
-          exclude: ['/', '/login', '/signup', '/catalogue-de-jeu', '/catalogue-de-jeu/**', '/a-propos'],
+          login: "/login",
+          callback: "/",
+          exclude: [
+            "/",
+            "/login",
+            "/signup",
+            "/catalogue-de-jeu",
+            "/catalogue-de-jeu/**",
+            "/a-propos",
+          ],
           saveRedirectToCookie: true,
-          cookieRedirect: true
-        }
-      }
-    }
+          cookieRedirect: true,
+        },
+      },
+    },
   },
 
-  css: ['@/assets/styles/base.css'],
-})
+  css: ["@/assets/styles/base.css"],
+});

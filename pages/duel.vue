@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDuelStore } from '@/stores/useDuelStore'
-import { useGamesStore } from '@/stores/useGamesStore'
+import { useAuthStore } from '@/stores/auth'
 import DuelGameCard from '@/components/Games/DuelGameCard.vue'
 import { useGameUtils } from '~/utils/useGameUtils'
 
@@ -8,23 +8,31 @@ definePageMeta({
   title: 'Duels de Jeux - Quel jeu préférez-vous ?'
 })
 
+const router = useRouter()
+const authStore = useAuthStore()
+const user = authStore.user
+
+if (!user) {
+  router.push('/login')
+}
+
 const duelStore = useDuelStore()
-const gamesStore = useGamesStore()
-const { getCoverUrl } = useGameUtils()
+const { getCoverUrl, transformGameData } = useGameUtils()
+const { gameData } = await useGames()
 
 const showStats = ref(false)
 const winner = ref<number | null>(null)
 const showWinnerAnimation = ref(false)
 
-onMounted(async () => {
-  if (gamesStore.games.length === 0) {
-    await gamesStore.fetchGames()
-  }
-  
-  if (!duelStore.currentDuel) {
-    duelStore.createNewDuel()
-  }
+const games = computed(() => {
+  return gameData ? gameData.map(transformGameData) : []
 })
+
+watch(games, (newGames) => {
+  if (newGames.length >= 2 && !duelStore.currentDuel) {
+    duelStore.createNewDuel(newGames)
+  }
+}, { immediate: true })
 
 const handleVote = (gameId: number) => {
   winner.value = gameId
@@ -40,7 +48,7 @@ const handleVote = (gameId: number) => {
 const newDuel = () => {
   winner.value = null
   showWinnerAnimation.value = false
-  duelStore.createNewDuel()
+  duelStore.createNewDuel(games.value)
 }
 
 const toggleStats = () => {
@@ -50,53 +58,71 @@ const toggleStats = () => {
 const resetAll = () => {
   if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes les statistiques ?')) {
     duelStore.resetDuels()
-    duelStore.createNewDuel()
+    duelStore.createNewDuel(games.value)
     showStats.value = false
   }
 }
 
 const canCreateDuel = computed(() => {
-  return gamesStore.games.length >= 2
+  return games.value.length >= 2
 })
 </script>
 
 <template>
-  <div class="duel-container">
-    <header class="duel-header">
-      <h1 class="title">⚔️ Duels de Jeux</h1>
-      <p class="subtitle">Quel jeu préférez-vous ? Cliquez sur votre choix !</p>
+  <div v-if="user" class="min-h-screen p-8 max-w-7xl mx-auto">
+    <header class="text-center mb-12">
+      <h1 class="text-5xl font-bold text-cyan-400 mb-4 drop-shadow-[0_0_20px_rgba(34,211,238,0.6)]">
+        ⚔️ Duels de Jeux
+      </h1>
+      <p class="text-xl text-gray-300 mb-8">
+        Quel jeu préférez-vous ? Cliquez sur votre choix !
+      </p>
       
-      <div class="quick-stats">
-        <div class="stat-item">
-          <span class="stat-number">{{ duelStore.stats.totalDuels }}</span>
-          <span class="stat-label">Duels réalisés</span>
+      <div class="flex justify-center gap-12 my-8">
+        <div class="text-center">
+          <span class="block text-4xl font-bold text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
+            {{ duelStore.stats.totalDuels }}
+          </span>
+          <span class="text-gray-400 text-sm">Duels réalisés</span>
         </div>
-        <div class="stat-item">
-          <span class="stat-number">{{ Object.keys(duelStore.stats.gamesStats).length }}</span>
-          <span class="stat-label">Jeux évalués</span>
+        <div class="text-center">
+          <span class="block text-4xl font-bold text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
+            {{ Object.keys(duelStore.stats.gamesStats).length }}
+          </span>
+          <span class="text-gray-400 text-sm">Jeux évalués</span>
         </div>
       </div>
 
-      <div class="header-actions">
-        <button @click="newDuel" class="action-btn" :disabled="!canCreateDuel">
+      <div class="flex justify-center gap-4 flex-wrap">
+        <button 
+          @click="newDuel" 
+          :disabled="!canCreateDuel"
+          class="px-6 py-3 border border-cyan-400 bg-cyan-400/10 text-cyan-400 rounded-full font-bold transition-all duration-300 hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_15px_rgba(34,211,238,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           🎲 Nouveau Duel
         </button>
-        <button @click="toggleStats" class="action-btn stats-btn">
+        <button 
+          @click="toggleStats" 
+          class="px-6 py-3 border border-blue-500 bg-blue-500/10 text-blue-500 rounded-full font-bold transition-all duration-300 hover:bg-blue-500 hover:text-white"
+        >
           📊 {{ showStats ? 'Masquer' : 'Voir' }} Stats
         </button>
-        <button @click="resetAll" class="action-btn reset-btn">
+        <button 
+          @click="resetAll" 
+          class="px-6 py-3 border border-red-500 bg-red-500/10 text-red-500 rounded-full font-bold transition-all duration-300 hover:bg-red-500 hover:text-white"
+        >
           🗑️ Reset
         </button>
       </div>
     </header>
 
-    <div v-if="!canCreateDuel" class="error-message">
-      <h3>⚠️ Pas assez de jeux disponibles</h3>
+    <div v-if="!canCreateDuel" class="text-center bg-red-500/10 border border-red-500 rounded-2xl p-8 text-red-500">
+      <h3 class="text-lg font-semibold mb-2">⚠️ Pas assez de jeux disponibles</h3>
       <p>Il faut au moins 2 jeux pour créer des duels. Rechargez la page ou vérifiez votre connexion.</p>
     </div>
 
-    <section v-else-if="duelStore.currentDuel && !showStats" class="duel-arena">
-      <div class="vs-container">
+    <section v-else-if="duelStore.currentDuel && !showStats" class="relative">
+      <div class="flex justify-center items-center gap-8 max-w-5xl mx-auto lg:flex-row flex-col">
         <DuelGameCard
           :game="duelStore.currentDuel.game1"
           :isClickable="!showWinnerAnimation"
@@ -104,9 +130,12 @@ const canCreateDuel = computed(() => {
           @select="handleVote"
         />
 
-        <div class="vs-divider">
-          <div class="vs-text">VS</div>
-          <div class="vs-line"></div>
+        <div class="flex flex-col items-center gap-4 min-w-[100px] lg:rotate-0 rotate-90">
+          <div class="text-4xl font-bold text-cyan-400 animate-pulse drop-shadow-[0_0_15px_rgba(34,211,238,0.7)]">
+            VS
+          </div>
+          <div class="w-0.5 h-24 bg-gradient-to-b from-transparent via-cyan-400 to-transparent lg:block hidden"></div>
+          <div class="h-0.5 w-24 bg-gradient-to-r from-transparent via-cyan-400 to-transparent lg:hidden block"></div>
         </div>
 
         <DuelGameCard
@@ -117,394 +146,61 @@ const canCreateDuel = computed(() => {
         />
       </div>
 
-      <div v-if="showWinnerAnimation" class="transition-overlay">
-        <div class="transition-content">
-          <h2>🎉 Excellent choix !</h2>
-          <p>Préparation du prochain duel...</p>
-          <div class="loading-spinner"></div>
+      <div v-if="showWinnerAnimation" class="absolute inset-0 bg-black/80 flex items-center justify-center backdrop-blur-sm z-10">
+        <div class="text-center text-white">
+          <h2 class="text-3xl font-bold text-cyan-400 mb-4">🎉 Excellent choix !</h2>
+          <p class="text-lg mb-4">Préparation du prochain duel...</p>
+          <div class="w-10 h-10 border-4 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     </section>
 
-    <section v-if="showStats" class="stats-section">
-      <h2 class="stats-title">📊 Statistiques des Duels</h2>
+    <section v-if="showStats" class="max-w-4xl mx-auto">
+      <h2 class="text-center text-cyan-400 text-4xl font-bold mb-8">📊 Statistiques des Duels</h2>
       
-      <div class="stats-overview">
-        <div class="stat-card">
-          <h3>Total des duels</h3>
-          <p class="big-number">{{ duelStore.stats.totalDuels }}</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <div class="bg-white/5 border border-white/20 rounded-2xl p-8 text-center backdrop-blur-sm">
+          <h3 class="text-gray-300 mb-4 text-lg">Total des duels</h3>
+          <p class="text-5xl font-bold text-cyan-400">{{ duelStore.stats.totalDuels }}</p>
         </div>
-        <div class="stat-card">
-          <h3>Jeux évalués</h3>
-          <p class="big-number">{{ Object.keys(duelStore.stats.gamesStats).length }}</p>
+        <div class="bg-white/5 border border-white/20 rounded-2xl p-8 text-center backdrop-blur-sm">
+          <h3 class="text-gray-300 mb-4 text-lg">Jeux évalués</h3>
+          <p class="text-5xl font-bold text-cyan-400">{{ Object.keys(duelStore.stats.gamesStats).length }}</p>
         </div>
       </div>
 
-      <div v-if="duelStore.topGames.length > 0" class="top-games">
-        <h3>🏆 Top des Jeux (minimum 3 duels)</h3>
-        <div class="top-games-list">
+      <div v-if="duelStore.topGames.length > 0">
+        <h3 class="text-yellow-400 text-center mb-8 text-2xl font-bold">🏆 Top des Jeux (minimum 3 duels)</h3>
+        <div class="flex flex-col gap-4">
           <div
             v-for="(item, index) in duelStore.topGames"
             :key="item.game?.id"
-            class="top-game-item"
+            class="flex items-center gap-4 bg-white/5 border border-white/20 rounded-2xl p-4 backdrop-blur-sm"
           >
-            <div class="rank">{{ index + 1 }}</div>
+            <div class="text-2xl font-bold text-yellow-400 min-w-[40px] text-center">
+              {{ index + 1 }}
+            </div>
             <img
               v-if="item.game?.cover?.image_id"
               :src="getCoverUrl(item.game.cover.image_id)"
               :alt="item.game.name"
-              class="top-game-cover"
+              class="w-15 h-20 object-cover rounded-lg"
             />
-            <div class="top-game-info">
-              <h4>{{ item.game?.name }}</h4>
-              <div class="top-game-stats">
-                <span class="win-rate">{{ Math.round(item.stats.winRate) }}% victoires</span>
-                <span class="total-duels">{{ item.stats.wins + item.stats.losses }} duels</span>
+            <div class="flex-1">
+              <h4 class="text-cyan-400 font-semibold mb-2">{{ item.game?.name }}</h4>
+              <div class="flex gap-4 text-sm">
+                <span class="text-green-400 font-bold">{{ Math.round(item.stats.winRate) }}% victoires</span>
+                <span class="text-gray-400">{{ item.stats.wins + item.stats.losses }} duels</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
+      <div v-else class="text-center text-gray-400 py-12">
+        <p class="text-lg mb-2">🎮 Pas encore assez de données pour afficher un classement.</p>
+        <p>Réalisez quelques duels pour voir les statistiques !</p>
+      </div>
     </section>
   </div>
-</template>
-
-<style scoped>
-.duel-container {
-  min-height: 100vh;
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.duel-header {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.title {
-  font-size: 3rem;
-  color: #00ffcc;
-  text-shadow: 0 0 20px rgba(0, 255, 204, 0.6);
-  margin: 0 0 1rem 0;
-  font-weight: bold;
-}
-
-.subtitle {
-  font-size: 1.3rem;
-  color: #ddd;
-  margin: 0 0 2rem 0;
-}
-
-.quick-stats {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  margin: 2rem 0;
-}
-
-.stat-item {
-  text-align: center;
-}
-
-.stat-number {
-  display: block;
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #00ffcc;
-  text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
-}
-
-.stat-label {
-  color: #aaa;
-  font-size: 0.9rem;
-}
-
-.header-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.action-btn {
-  padding: 0.8rem 1.5rem;
-  border: 1px solid #00ffcc;
-  background: rgba(0, 255, 204, 0.1);
-  color: #00ffcc;
-  border-radius: 25px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-
-.action-btn:hover:not(:disabled) {
-  background: #00ffcc;
-  color: #000;
-  box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
-}
-
-.action-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.stats-btn {
-  border-color: #007bff;
-  color: #007bff;
-  background: rgba(0, 123, 255, 0.1);
-}
-
-.stats-btn:hover {
-  background: #007bff;
-  color: #fff;
-}
-
-.reset-btn {
-  border-color: #ff4d4d;
-  color: #ff4d4d;
-  background: rgba(255, 77, 77, 0.1);
-}
-
-.reset-btn:hover {
-  background: #ff4d4d;
-  color: #fff;
-}
-
-.error-message {
-  text-align: center;
-  background: rgba(255, 77, 77, 0.1);
-  border: 1px solid #ff4d4d;
-  border-radius: 15px;
-  padding: 2rem;
-  color: #ff4d4d;
-}
-
-.duel-arena {
-  position: relative;
-}
-
-.vs-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.vs-divider {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  min-width: 100px;
-}
-
-.vs-text {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #00ffcc;
-  text-shadow: 0 0 15px rgba(0, 255, 204, 0.7);
-  animation: pulse 2s infinite;
-}
-
-.vs-line {
-  width: 2px;
-  height: 100px;
-  background: linear-gradient(to bottom, transparent, #00ffcc, transparent);
-}
-
-.transition-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(5px);
-  z-index: 10;
-}
-
-.transition-content {
-  text-align: center;
-  color: #fff;
-}
-
-.transition-content h2 {
-  color: #00ffcc;
-  margin-bottom: 1rem;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(0, 255, 204, 0.3);
-  border-top: 3px solid #00ffcc;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 1rem auto;
-}
-
-.stats-section {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.stats-title {
-  text-align: center;
-  color: #00ffcc;
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
-}
-
-.stats-overview {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
-}
-
-.stat-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 15px;
-  padding: 2rem;
-  text-align: center;
-  backdrop-filter: blur(10px);
-}
-
-.stat-card h3 {
-  color: #ddd;
-  margin: 0 0 1rem 0;
-}
-
-.big-number {
-  font-size: 3rem;
-  font-weight: bold;
-  color: #00ffcc;
-  margin: 0;
-}
-
-.top-games h3 {
-  color: #ffd700;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.top-games-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.top-game-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 15px;
-  padding: 1rem;
-  backdrop-filter: blur(10px);
-}
-
-.rank {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #ffd700;
-  min-width: 40px;
-  text-align: center;
-}
-
-.top-game-cover {
-  width: 60px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.top-game-info {
-  flex: 1;
-}
-
-.top-game-info h4 {
-  color: #00ffcc;
-  margin: 0 0 0.5rem 0;
-}
-
-.top-game-stats {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.9rem;
-}
-
-.win-rate {
-  color: #4caf50;
-  font-weight: bold;
-}
-
-.total-duels {
-  color: #aaa;
-}
-
-.no-stats {
-  text-align: center;
-  color: #aaa;
-  padding: 3rem;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-@media (max-width: 768px) {
-  .duel-container {
-    padding: 1rem;
-  }
-  
-  .title {
-    font-size: 2rem;
-  }
-  
-  .vs-container {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .vs-divider {
-    transform: rotate(90deg);
-  }
-  
-  .vs-line {
-    width: 100px;
-    height: 2px;
-  }
-  
-  .quick-stats {
-    gap: 1.5rem;
-  }
-  
-  .stat-number {
-    font-size: 2rem;
-  }
-  
-  .header-actions {
-    gap: 0.5rem;
-  }
-  
-  .action-btn {
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
-  }
-}</style>
+  </template>

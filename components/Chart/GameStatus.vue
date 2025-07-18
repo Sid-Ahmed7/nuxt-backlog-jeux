@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import {computed} from 'vue';
 import { Bar } from 'vue-chartjs';
 import { BarElement, CategoryScale, Chart, Legend, LinearScale, Title, Tooltip, type ChartOptions  } from 'chart.js';
 
-import type { UserGame } from '~/types/UserGame';
-import { GameStatus } from '~/types/enums';
+import type { UserGame } from '@/types/UserGame';
+import { GameStatus } from '@/types/enums';
 
 
 Chart.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
@@ -27,7 +26,7 @@ const gameFinished = computed(() => {
 })
 
 const data = computed(() => ({
-    labels: ['En cours', 'Terminés', 'Non commencés'],
+    labels: ['Non commencés','En cours', 'Terminés', ],
     datasets: [{
         label: 'Nombre de jeux',
         backgroundColor: ['#3498db', '#2ecc71', '#e74c3c'],

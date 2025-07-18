@@ -8,18 +8,29 @@ export const useDuelStore = defineStore('duel', () => {
   const currentDuel = ref<Duel | null>(null)
   const duelHistory = ref<DuelResult[]>([])
   const isLoading = ref(false)
+  const lastGamesList = ref<Game[]>([])
 
-  const createNewDuel = () => {
-    const gamesStore = useGamesStore()
-    const availableGames = gamesStore.games.filter(game => 
+  const createNewDuel = (gamesList?: Game[]) => {
+    // Utiliser la liste fournie ou le store par défaut (pour compatibilité)
+    let sourceGames: Game[] = []
+    
+    if (gamesList && gamesList.length > 0) {
+      sourceGames = gamesList
+      lastGamesList.value = gamesList
+    } else {
+      const gamesStore = useGamesStore()
+      sourceGames = gamesStore.games
+    }
+    
+    const filteredGames = sourceGames.filter(game => 
       game.id && game.name && game.cover?.image_id
     )
 
-    if (availableGames.length < 2) {
+    if (filteredGames.length < 2) {
       throw new Error('Pas assez de jeux disponibles pour créer un duel')
     }
 
-    const shuffled = [...availableGames].sort(() => 0.5 - Math.random())
+    const shuffled = [...filteredGames].sort(() => 0.5 - Math.random())
     const game1 = shuffled[0]
     const game2 = shuffled[1]
 
@@ -53,8 +64,9 @@ export const useDuelStore = defineStore('duel', () => {
       timestamp: new Date()
     })
 
+    // Créer automatiquement un nouveau duel
     setTimeout(() => {
-      createNewDuel()
+      createNewDuel(lastGamesList.value)
     }, 1000)
   }
 

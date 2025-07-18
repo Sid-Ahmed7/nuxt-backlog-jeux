@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import ProfileHeader from '@/components/Profile/ProfileHeader.vue';
 import ProfileNavBar from '@/components/Profile/ProfileNavBar.vue';
@@ -7,20 +6,20 @@ import GameInProgress from '~/components/Chart/GameStatus.vue';
 import GameByPlatform from '@/components/Chart/GameByPlatform.vue';
 import UserGameCard from '@/components/Games/UserGameCard.vue';
 import Pagination from '@/components/Pagination.vue';
-import { useUserGamesStore } from '@/stores/useUserGamesStore';
-import { useAuthStore } from '@/stores/useAuthStore';
+
+import type { Game } from '@/types/Game';
+import type { UserGame } from '@/types/UserGame';
 
 
 const router = useRouter()
 const supabase = useSupabaseClient()
 const userGameStore = useUserGamesStore();
 const authStore = useAuthStore()
+const {transformUserGame} = useGameUtils()
 const user = authStore.user
 const activeTab = ref<'all' | 'stats'>('all')
 const currentPage = ref(1)
 const gamesPerPage = 6
-
-
 
 if (!user) {
   router.push('/login')
@@ -32,26 +31,46 @@ const { data: res, error } = await useAsyncData('profile',  async () => supabase
   .eq('user_id', user?.id || '')
   .maybeSingle())
 
-   if(res.value) {
-        await userGameStore.fetchUserGames(user!.id); 
-        console.log(userGameStore.fetchUserGames(user!.id))
-   } else {
-      router.push('/login')
-    }
-
-
 const profile = computed(() => res.value?.data ?? null)
+
+
+const { data: gamesData } = await useAsyncData('detailedUserGames', async () => {
+    if (!user?.id) return []
+
+  await userGameStore.fetchUserGames(user.id)
+
+  const gameData = await Promise.all(
+    userGameStore.userGames.map(async (userGame: any) => {
+      try {
+        const game = await $fetch<Game[]>(`/api/userGames/${userGame.id_game}`)
+        
+        return transformUserGame(userGame,game[0])
+      } catch (e) {
+        console.error(`Erreur lors du fetch du jeu ${userGame.id_game}`, e)
+        return null
+      }
+    })
+  )
+
+  return gameData.filter(Boolean) as UserGame[]
+})
+
+watch(() => gamesData.value, (newVal) => {
+  if(newVal) {
+    userGameStore.setGames(newVal)
+  }
+}, {immediate: true})
+
+const userGamesWithDetails = computed(() => userGameStore.userGames ?? [])
 
 const paginatedGames = computed(() => {
   const start = (currentPage.value - 1) * gamesPerPage
-  return userGameStore.userGames.slice(start, start + gamesPerPage)
+  return userGamesWithDetails.value.slice(start, start + gamesPerPage)
 })
 
 const totalPages = computed(() => {
-  return Math.ceil(userGameStore.userGames.length / gamesPerPage)
+  return Math.ceil(userGamesWithDetails.value.length / gamesPerPage)
 })
-
-watch
 
 </script>
 
@@ -72,6 +91,8 @@ watch
             ></UserGameCard>
     </div>
     <Pagination 
+     v-if="userGamesWithDetails.length > 0"
+
       :totalPages="totalPages"
       :currentPage="currentPage"
       @update:currentPage="currentPage = $event" /> 
@@ -79,10 +100,10 @@ watch
 
     <div v-else-if ="activeTab === 'stats'" class="stats">
       <div class="chart-card">
-      <GameInProgress :games="userGameStore.userGames" />
+      <GameInProgress :games="userGamesWithDetails" />
       </div>
       <div class="chart-card">
-      <GameByPlatform :games="userGameStore.userGames" />
+      <GameByPlatform :games="userGamesWithDetails" />
       </div>
     </div>
 
