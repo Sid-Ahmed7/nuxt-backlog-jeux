@@ -67,24 +67,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="comments-section">
-    <h3>Commentaires</h3>
+  <div class="px-6 py-5 bg-zinc-900 rounded-2xl my-8 text-white">
+    <h3 class="mb-4 pb-2 border-b-2 border-purple-700 text-xl font-semibold">Commentaires</h3>
 
-    <div v-if="user && props.gameId" class="comment-form">
-      <textarea v-model="newComment" placeholder="Laisse ton avis..." rows="3" />
-      <button @click="submitComment" :disabled="!newComment.trim()">
+    <div v-if="user && props.gameId" class="flex flex-col mb-6">
+      <textarea v-model="newComment" placeholder="Laisse ton avis..." rows="3"  class="p-3 rounded-lg border-none bg-zinc-800 text-white mb-3 resize-none" />
+      <button @click="submitComment" :disabled="!newComment.trim()"   class="self-end px-4 py-2 bg-main text-white rounded-lg disabled:bg-main disabled:cursor-not-allowed">
         Envoyer
     </button>
     </div>
 
-    <div v-else class="login-info">
+    <div v-else class="text-gray-400 italic mb-4">
       Connecte-toi pour ajouter un commentaire.
     </div>
 
-    <div class="comments-list">
-      <div v-for="comment in comments" :key="comment.id" class="comment-item">
+    <div class="flex flex-col gap-4">
+      <div v-for="comment in comments" :key="comment.id" class="bg-zinc-500 p-3 rounded-lg">
         <p>{{ comment.content }}</p>
-        <small>{{ new Date(comment.created_at).toLocaleString() }}</small>
+        <small class="text-gray-400 text-sm">{{ new Date(comment.created_at).toLocaleString() }}</small>
       </div>
     </div>
   </div>
