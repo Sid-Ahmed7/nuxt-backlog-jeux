@@ -18,108 +18,45 @@ const handleSubmit = () => {
         }
     }
 }
+
+
+watch(() => props.game, (newVal) => {
+    if(newVal) {
+        document.body.style.overflow = 'hidden'
+    } else {
+        document.body.style.overflow = ''
+    }
+},{ immediate: true })
+
+onUnmounted(() => {
+  document.body.style.overflow = ''
+})
 </script>
 
 <template>
 
-<div class="modal-overlay">
-    <div class="modal">
-        <h2>Choisissez la plateforme sur lequel vous avez joué</h2>
-        <div class="platform-list">
+  <div class="fixed inset-0 bg-black/70 flex justify-center items-center z-[1000]">
+    <div class="bg-gray-800 rounded-lg p-8 w-11/12 max-w-lg flex flex-col items-center gap-6">
+        <h2 class="text-white text-xl font-semibold">Choisissez la plateforme sur lequel vous avez joué</h2>
+        <div class="w-full max-h-72 overflow-y-auto flex flex-col gap-4">
             <label 
                 v-for="platform in game?.platforms"
                 :key="platform.id"
-                class="platform-option"
+                class="flex items-center gap-4 cursor-pointer bg-gray-700 rounded-md p-4"
             >
         
             <input type="radio"
                 :value="platform.id"
-                v-model="selectedPlatformId" />
-                <div class="platform-name">
+                v-model="selectedPlatformId" class="form-radio text-green-00" />
+                <div class="text-white font-medium">
                     <h3>{{ platform.name }}</h3>
                 </div>
         </label>
         </div>
-        <div class="modal-actions">
-            <button @click="handleSubmit">Ajouter</button>
-            <button @click="$emit('close')">Annuler</button>
+        <div class="w-full flex justify-between gap-4">
+            <button @click="handleSubmit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition">Ajouter</button>
+            <button @click="$emit('close')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition">Annuler</button>
         </div>
     </div>
 </div>
 </template>
-
-<style scoped>
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal {
-    background-color: #2c2c2c;
-    border-radius: 0.5rem;
-    padding: 2rem;
-    width: 80%;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap:1rem;
-}
-
-.platform-list {
-    max-height: 300px;
-    overflow-y: auto;
-    justify-content: flex-start;
-    display: flex;
-    flex-wrap: column;
-    gap: 1rem;
-
-    width: 100%;
-}
-
-.platform-option {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    cursor: pointer;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    background-color: #3c3c3c;
-    transition: background-color 0.3s ease;
-}
-.platform-option input {
-    margin-right: 1rem;
-}
-
-
-
-.modal-actions {
-    display: flex;
-    gap: 1rem;
-    width: 100%;
-    justify-content: space-between;
-}
-
-.modal-actions button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-}
-    
-
-
-
-
-</style>

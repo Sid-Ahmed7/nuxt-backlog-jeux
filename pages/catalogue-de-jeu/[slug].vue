@@ -10,7 +10,7 @@ import RelatedGamesSection from '~/components/Games/RelatedGamesSection.vue';
 
 const userGamesStore = useUserGamesStore();
 const authStore = useAuthStore()
-const { getCoverUrl, getArtworkUrl, getScreenshotUrl, formatReleaseDate, transformGameData } = useGameUtils();
+const { getScreenshotUrl, formatReleaseDate, transformGameData } = useGameUtils();
 
 const route = useRoute();
 const router = useRouter();
@@ -28,7 +28,6 @@ const {data: gameData, error} = useAsyncData('game', ( ) =>
 ); 
 
 const game = computed(() => gameData.value ?? null);
-
 
 const addToUserList = () => {
   if( game.value !== null && game.value.platforms && game.value.platforms.length > 0) {
@@ -52,8 +51,6 @@ const handlePlatformSelect = (platformName:string) => {
 
 const isGameIsAdd = computed(() => {
   return userGamesStore.userGames.some((g) => g.game.id === game.value?.id)
-
-
 })
 
 const changeMainImage = (index: number) =>{
@@ -92,13 +89,12 @@ console.log(route.params.slug)
   <GameHeader :game="game" />
 
 
-  <div v-if="authStore.user"  class="action-buttons">
-    <button class="btn primary" v-if="!isGameIsAdd" @click="addToUserList">Ajouter à ma liste</button>
-    <button class="btn primary" v-else @click="removeFromUserList">Retirer de ma liste</button>
+  <div v-if="authStore.user"  class="flex flex-wrap gap-5 px-6 py-5 ">
+    <button class="bg-main text-white font-bold py-3 px-5 rounded" v-if="!isGameIsAdd" @click="addToUserList">Ajouter à ma liste</button>
+    <button class="bg-main text-white font-bold py-3 px-5 rounded" v-else @click="removeFromUserList">Retirer de ma liste</button>
   </div>
 
   <GameInfo :game="game" />
-
  
   <div v-if="game?.screenshots?.length" class="extra-info screenshots-section">
     <h3>Captures d'écran de {{ game.name }}</h3>

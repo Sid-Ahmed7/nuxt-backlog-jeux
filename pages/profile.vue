@@ -91,6 +91,8 @@ const totalPages = computed(() => {
             ></UserGameCard>
     </div>
     <Pagination 
+     v-if="userGamesWithDetails.length > 0"
+
       :totalPages="totalPages"
       :currentPage="currentPage"
       @update:currentPage="currentPage = $event" /> 
