@@ -78,10 +78,10 @@ onMounted(async () => {
       <div v-else-if="noResults">
         <h2 class="text-xl text-main text-center mt-8">Aucun résultat trouvé</h2>
       </div>
-      <section v-else class="w-full">
+      <div v-else class="w-full">
         <GamesList :games="paginatedGames" :error="error" />
           <Pagination :currentPage="currentPage" :totalPages="totalPages" @update:currentPage="currentPage = $event" />
-      </section>
+      </div>
     </div>
     </div>
   </div>
