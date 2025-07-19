@@ -13,164 +13,49 @@ const logout = async () => {
   router.push("/login");
 };
 </script>
-
 <template>
-  <nav class="nav">
-    <div class="logo-container">
+  <nav class="flex items-center justify-between bg-neutral-900 h-16 px-6 relative">
+    <div class="flex-grow">
       <NuxtLink to="/">
-        <img
-          src="../assets/images/logo.png"
-          alt="Logo"
-          id="logo"
-          width="64px"
-        />
+        <img src="../assets/images/logo.png" alt="Logo" class="h-10 w-auto" />
       </NuxtLink>
     </div>
 
-    <div class="menu-icon" @click="toggleMenu">
-      <div class="menu-button"></div>
+    <div class="md:hidden cursor-pointer z-20" @click="toggleMenu">
+      <div class="w-8 h-0.5 bg-gray-200 relative rounded transition-all">
+        <span class="absolute w-8 h-0.5 bg-gray-200 rounded -top-2 left-0"></span>
+        <span class="absolute w-8 h-0.5 bg-gray-200 rounded top-2 left-0"></span>
+      </div>
     </div>
 
-    <ul class="menu" :class="{ 'menu-open': isOpen }">
+    <ul
+      :class="[
+        'flex flex-col md:flex-row md:static absolute left-0 w-full md:w-auto bg-neutral-900 md:bg-transparent mt-16 md:mt-0 z-10 transition-all duration-300',
+        isOpen ? 'top-0 opacity-100 visible' : 'top-[-500px] opacity-0 invisible md:opacity-100 md:visible',
+      ]"
+      class="space-y-4 md:space-y-0 md:space-x-6 text-center md:text-left text-main font-medium"
+    >
       <li>
-        <NuxtLink to="/">Accueil</NuxtLink>
+        <NuxtLink to="/" >Accueil</NuxtLink>
       </li>
       <li>
-        <NuxtLink to="/catalogue-de-jeu">Jeux</NuxtLink>
-      </li>
-
-      <li v-if="!authStore.user">
-        <NuxtLink to="/login">Connexion</NuxtLink>
+        <NuxtLink to="/catalogue-de-jeu" >Jeux</NuxtLink>
       </li>
       <li v-if="!authStore.user">
-        <NuxtLink to="/signup">Inscription</NuxtLink>
+        <NuxtLink to="/login" >Connexion</NuxtLink>
+      </li>
+      <li v-if="!authStore.user">
+        <NuxtLink to="/signup" >Inscription</NuxtLink>
       </li>
       <li v-if="authStore.user">
-        <NuxtLink to="/profile">Profil</NuxtLink>
+        <NuxtLink to="/profile" >Profil</NuxtLink>
       </li>
       <li>
-        <NuxtLink to="/a-propos">À propos</NuxtLink>
+        <NuxtLink to="/a-propos" >À propos</NuxtLink>
       </li>
       <li v-if="authStore.user">
-        <NuxtLink to="/" @click.prevent="authStore.logout"
-          >Déconnexion</NuxtLink
-        >
+        <NuxtLink to="/" @click.prevent="logout" >Déconnexion</NuxtLink>
       </li>
     </ul>
   </nav>
 </template>
-
-<style scoped>
-.nav {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #292729;
-  height: 4rem;
-  padding: 1rem 2rem;
-  position: relative;
-}
-
-.logo-container {
-  flex-grow: 1;
-}
-
-#logo {
-  max-height: 100%;
-  max-width: 120px;
-}
-
-.menu {
-  display: flex;
-  flex-direction: row;
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-
-.menu > li {
-  margin: 0 1rem;
-}
-.menu a {
-  color: var(--main-color);
-  text-decoration: none;
-}
-
-.menu-icon {
-  display: none;
-  cursor: pointer;
-  z-index: 10;
-}
-
-.menu-button {
-  width: 2rem;
-  height: 0.25rem;
-  background-color: #eee;
-  position: relative;
-  border-radius: 0.5rem;
-  transition: transform 0.3s ease;
-}
-
-.menu-button::before,
-.menu-button::after {
-  content: "";
-  position: absolute;
-  width: 2rem;
-  height: 0.25rem;
-  background-color: #eee;
-  border-radius: 0.5rem;
-  transition: transform 0.3s ease;
-}
-
-.menu-button::before {
-  top: -0.5rem;
-}
-
-.menu-button::after {
-  top: 0.5rem;
-}
-
-@media (max-width: 768px) {
-  .menu-icon {
-    display: block;
-  }
-
-  .menu {
-    display: none;
-    flex-direction: column;
-    position: absolute;
-    top: 32px;
-    left: 0;
-    width: 100%;
-    background-color: #292729;
-    margin-top: 4rem;
-    z-index: 9;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0s 0.3s;
-  }
-
-  .menu.menu-open {
-    display: block;
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.3s ease, visibility 0s 0s;
-  }
-  .menu > li {
-    width: 88%;
-    text-align: center;
-    padding: 1rem;
-    border-bottom: 1px solid #444;
-    transition: background-color 0.3s ease;
-  }
-
-  .menu > li:hover {
-    background-color: #444;
-  }
-
-  .menu > li:last-child {
-    border-bottom: none;
-  }
-}
-</style>

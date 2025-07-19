@@ -78,7 +78,7 @@ const toggleStatusGame = () => {
 
 <template>
   <div
-    class="flex flex-col md:flex-row bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden max-w-2xl mx-auto shadow-lg hover:shadow-indigo-700 transition duration-300 min-h-[200px]"
+    class="flex flex-col md:flex-row bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden max-w-2xl mx-auto shadow-lg hover:shadow-main transition duration-300 min-h-[200px]"
   >
     <div class="md:w-40 md:flex-shrink-0">
       <img
@@ -125,7 +125,7 @@ const toggleStatusGame = () => {
           @click="toggleStatusGame"
           :class="[
             'px-6 py-2 rounded-xl font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[140px]',
-            isFinished ? 'bg-indigo-400 hover:bg-indigo-500 text-black' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+            isFinished ? 'bg-indigo-400 hover:bg-indigo-500 text-black' : 'bg-indigo-600 text-white'
           ]"
         >
           {{ labelBtn }}

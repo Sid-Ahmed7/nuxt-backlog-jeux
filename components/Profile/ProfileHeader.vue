@@ -16,7 +16,7 @@ const bio = computed(() => props.user.bio || '')
       <img
         :src="defaultAvatar"
         :alt="`Avatar de ${user.username}`"
-        class="w-36 h-36 rounded-full border-4 border-indigo-600 object-cover"
+        class="w-36 h-36 rounded-full border-4 border-main object-cover"
       />
       <div>
         <h1 class="text-3xl font-bold text-white">
@@ -27,11 +27,9 @@ const bio = computed(() => props.user.bio || '')
         </p>
       </div>
     </div>
-
-    <!-- Bouton Editer -->
     <NuxtLink
       :to="`/edit-profile/${user.id}`"
-      class="self-start md:self-auto px-6 py-2 bg-indigo-600 rounded-xl text-white font-medium hover:bg-indigo-700 transition"
+      class="self-start md:self-auto px-6 py-2 bg-main rounded-xl text-white font-medium hover:bg-indigo-700 transition"
     >
       Éditer profil
     </NuxtLink>

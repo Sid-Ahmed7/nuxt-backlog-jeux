@@ -41,16 +41,7 @@ const options: ChartOptions<'doughnut'> = {
 </script>
 
 <template>
-    <div class="chart">
+  <div class="max-w-[400px] mx-auto mb-8">
         <Doughnut :data="data" :options="options" />
     </div>
 </template>
-
-<style scoped>
-.chart {
-    max-width: 400px;
-    margin: auto;
-    margin-bottom: 2rem;
-}
-
-</style>

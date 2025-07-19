@@ -55,15 +55,7 @@ scales: {
 </script>
 
 <template>
- <div class="chart">
+  <div class="mx-auto mb-8">
     <Bar :data="data" :options="options" />
  </div>
 </template>
-
-<style scoped>
-
-.chart {
-    margin: auto;
-    margin-bottom: 2rem;
-}
-</style>

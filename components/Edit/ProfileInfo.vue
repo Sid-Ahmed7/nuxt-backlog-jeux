@@ -106,89 +106,53 @@ onMounted(async () => {
 
 </script>
 <template>
-    <div class="form-container">
+  <div class="max-w-xl mx-auto my-16 p-8 rounded-xl">
+    <form @submit.prevent="updateInfoUser" class="flex flex-col gap-6">
+      <div class="flex flex-col">
+        <label class="font-semibold mb-2 text-white">Email</label>
+        <input
+          v-model="email"
+          type="email"
+          class="w-full border border-main text-white rounded-lg px-4 py-3 text-base"
+        />
+      </div>
 
-      <form @submit.prevent="updateInfoUser" class="form">
-        <div class="form-group">
-          <label class="block">Email</label>
-          <input v-model="email" type="email" class="w-full border px-3 py-2 rounded" />
-        </div>
-  
-        <div class="form-group">
-          <label class="block">Mot de passe (laisser vide si inchangé)</label>
-          <input v-model="password" type="password" class="w-full border px-3 py-2 rounded" />
-        </div>
-  
-        <div class="form-group">
-          <label class="block">Nom d'utilisateur</label>
-          <input v-model="username" type="text" class="w-full border px-3 py-2 rounded" />
-        </div>
-  
-        <div class="form-group"> 
-          <label class="block">Bio</label>
-          <textarea v-model="bio" class="w-full border px-3 py-2 rounded" rows="3"></textarea>
-        </div>
-  
-        <button
-          type="submit"
-          class="submit-btn"
-          :disabled="isUpdate"
-        >
-          {{ isUpdate ? 'Mise à jour...' : 'Enregistrer les modifications' }}
-        </button>
-      </form>
-    </div>
-  </template>
+      <div class="flex flex-col">
+        <label class="font-semibold mb-2 text-white">
+          Mot de passe (laisser vide si inchangé)
+        </label>
+        <input
+          v-model="password"
+          type="password"
+          class="w-full border border-main text-white rounded-lg px-4 py-3 text-base"
+        />
+      </div>
 
+      <div class="flex flex-col">
+        <label class="font-semibold mb-2 text-white">Nom d'utilisateur</label>
+        <input
+          v-model="username"
+          type="text"
+          class="w-full border border-main text-white rounded-lg px-4 py-3 text-base"
+        />
+      </div>
 
-  <style scoped>
-  .form-container {
-    max-width: 600px;
-    margin: 4rem auto;
-    padding: 2rem;
-    border-radius: 1rem;
-  }
+      <div class="flex flex-col">
+        <label class="font-semibold mb-2 text-white">Bio</label>
+        <textarea
+          v-model="bio"
+          rows="3"
+          class="w-full border border-main text-white rounded-lg px-4 py-3 text-base"
+        ></textarea>
+      </div>
 
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .form-group {
-    display:flex;
-    flex-direction : column;
-  }
-
-  label {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: var(--main-color);
-  }
-
-  input,textarea {
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-  }
-
-  .submit-btn {
-    background-color: var(--main-color);
-    color: #fff;
-    font-weight: 600;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-  }
-
-  .submit-btn:disabled {
-    cursor: not-allowed;
-  }
-
-
-
-
-
-
-  </style>
+      <button
+        type="submit"
+        class="bg-main text-white font-semibold rounded-lg py-3 disabled:cursor-not-allowed disabled:bg-indigo-400"
+        :disabled="isUpdate"
+      >
+        {{ isUpdate ? 'Mise à jour...' : 'Enregistrer les modifications' }}
+      </button>
+    </form>
+  </div>
+</template>

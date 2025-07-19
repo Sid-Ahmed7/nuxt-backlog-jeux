@@ -41,10 +41,4 @@ const { getCoverUrl } = useGameUtils()
             </div>
         </div>
     </div>
-
-
-
-
-
-
 </template>
