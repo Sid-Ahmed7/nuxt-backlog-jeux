@@ -1,15 +1,13 @@
 <script setup lang="ts">
-
 const props = defineProps<{
-  selectTab: 'all' | 'stats'
-}>()
+  selectTab: "all" | "stats";
+}>();
 
-const emit = defineEmits()
+const emit = defineEmits();
 
-const setTab =(tab: 'all' | 'stats') => {
-  emit('update:tab', tab)
-}
-
+const setTab = (tab: "all" | "stats") => {
+  emit("update:tab", tab);
+};
 </script>
 
 <template>
@@ -19,10 +17,10 @@ const setTab =(tab: 'all' | 'stats') => {
         <button
           @click="setTab('all')"
           :class="[
-            'px-6 py-2 rounded-lg transition',
+            'px-6 py-2 rounded-lg transition cursor-pointer',
             selectTab === 'all'
               ? 'bg-indigo-600 text-white shadow-md'
-              : 'text-gray-400 hover:text-indigo-400'
+              : 'text-gray-400 hover:text-indigo-400',
           ]"
         >
           Mes jeux
@@ -32,10 +30,10 @@ const setTab =(tab: 'all' | 'stats') => {
         <button
           @click="setTab('stats')"
           :class="[
-            'px-6 py-2 rounded-lg transition',
+            'px-6 py-2 rounded-lg transition cursor-pointer',
             selectTab === 'stats'
               ? 'bg-indigo-600 text-white shadow-md'
-              : 'text-gray-400 hover:text-indigo-400'
+              : 'text-gray-400 hover:text-indigo-400',
           ]"
         >
           Statistiques

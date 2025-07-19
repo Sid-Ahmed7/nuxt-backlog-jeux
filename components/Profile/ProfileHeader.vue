@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import type { UserProfile } from '@/types/UserProfile'
-import defaultAvatar from '@/assets/images/spidey.jpg'
+import type { UserProfile } from "@/types/UserProfile";
+import defaultAvatar from "@/assets/images/spidey.jpg";
 
 const props = defineProps<{
-  user: UserProfile
-}>()
+  user: UserProfile;
+}>();
 
-const bio = computed(() => props.user.bio || '')
+const bio = computed(() => props.user.bio || "");
 </script>
 
 <template>
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-12 mb-8">
-
+  <div
+    class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-12 mb-8"
+  >
     <div class="flex items-center gap-6">
       <img
         :src="defaultAvatar"
@@ -29,7 +30,7 @@ const bio = computed(() => props.user.bio || '')
     </div>
     <NuxtLink
       :to="`/edit-profile/${user.id}`"
-      class="self-start md:self-auto px-6 py-2 bg-main rounded-xl text-white font-medium hover:bg-indigo-700 transition"
+      class="self-start md:self-auto px-6 py-2 bg-main rounded-xl text-white font-medium hover:bg-main-hover transition"
     >
       Éditer profil
     </NuxtLink>
