@@ -13,38 +13,34 @@ const setTab =(tab: 'all' | 'stats') => {
 </script>
 
 <template>
-
-<nav class="navbar">
-  <ul>
-      <li :class="{ active: props.selectTab === 'all' }" @click="setTab('all')">Mes jeux</li>
-      <li :class="{ active: props.selectTab === 'stats' }" @click="setTab('stats')">Statistiques</li>
+  <nav class="mt-16 mb-20">
+    <ul class="flex justify-center space-x-8 text-lg font-semibold">
+      <li>
+        <button
+          @click="setTab('all')"
+          :class="[
+            'px-6 py-2 rounded-lg transition',
+            selectTab === 'all'
+              ? 'bg-indigo-600 text-white shadow-md'
+              : 'text-gray-400 hover:text-indigo-400'
+          ]"
+        >
+          Mes jeux
+        </button>
+      </li>
+      <li>
+        <button
+          @click="setTab('stats')"
+          :class="[
+            'px-6 py-2 rounded-lg transition',
+            selectTab === 'stats'
+              ? 'bg-indigo-600 text-white shadow-md'
+              : 'text-gray-400 hover:text-indigo-400'
+          ]"
+        >
+          Statistiques
+        </button>
+      </li>
     </ul>
-    </nav>
+  </nav>
 </template>
-
-<style scoped>
-.navbar {
-  margin-top: 4rem;
-  margin-bottom: 5rem;
-}
-
-.navbar ul {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.navbar li {
-  cursor: pointer;
-  font-weight: 500;
-  color: white;
-  background-color: var(--main-color);
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-}
-
-</style>

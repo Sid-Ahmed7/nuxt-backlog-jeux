@@ -1,170 +1,39 @@
 <script setup lang="ts">
 import type { UserProfile } from '@/types/UserProfile'
 import defaultAvatar from '@/assets/images/spidey.jpg'
-import defaultBanner from '@/assets/images/default_banner.png'
 
 const props = defineProps<{
   user: UserProfile
 }>()
 
-const avatarUrl = computed(() => {
-  return props.user.avatarUrl || defaultAvatar
-})
-const bannerUrl = computed(() => {
-  return props.user.bannerUrl || defaultBanner
-})
-
-const bio = computed(() => {
-  return props.user.bio || ''
-})
+const bio = computed(() => props.user.bio || '')
 </script>
 
 <template>
-  <div class="profile-header">
-    <div class="banner">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-12 mb-8">
 
-        <img :src="bannerUrl" alt="Banner" class="banner-image" />
-    </div>
-    <div class="avatar">
-      <img :src="avatarUrl" alt="Avatar" class="avatar-image" />
-    </div>
-    <div class="user-details">
-      <div class="user-status">
-        <h1>{{ user.username }}</h1>
-        <span class="status"></span>
-
-        <NuxtLink :to="`/edit-profile/${user.id}`" class="edit-btn">Éditer profil</NuxtLink>
-      </div>
-      <div class="user-bio">
-        <p>{{ bio }}</p>
+    <div class="flex items-center gap-6">
+      <img
+        :src="defaultAvatar"
+        :alt="`Avatar de ${user.username}`"
+        class="w-36 h-36 rounded-full border-4 border-indigo-600 object-cover"
+      />
+      <div>
+        <h1 class="text-3xl font-bold text-white">
+          {{ user.username }}
+        </h1>
+        <p class="mt-1 text-indigo-400 text-base">
+          {{ bio }}
+        </p>
       </div>
     </div>
+
+    <!-- Bouton Editer -->
+    <NuxtLink
+      :to="`/edit-profile/${user.id}`"
+      class="self-start md:self-auto px-6 py-2 bg-indigo-600 rounded-xl text-white font-medium hover:bg-indigo-700 transition"
+    >
+      Éditer profil
+    </NuxtLink>
   </div>
 </template>
-
-<style scoped>
-.profile-header {
-  display: grid;
-  grid-template-rows: auto auto;
-  row-gap: 1.5rem;
-  margin: 0 auto;
-  position: relative;
-}
-
-.banner {
-height: 35vh;
-  width: 100%;
-  overflow: hidden;
-}
-
-.banner-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar {
-  position: absolute;
-  top: 4rem;
-  left: 2rem;
-  width: 20%;
-  height: 45vh;
-  z-index: 10;
-}
-
-.avatar-image {
-  width: 80%;
-  height: 100%;
-  border-radius: 20%;
-  object-fit: cover;
-}
-
-.user-details {
-  padding:  2rem;
-  margin-left: 20rem;
-}
-
-.user-status {
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  align-items: center;
-  column-gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.user-status h1 {
-  font-size: 1.75rem;
-  margin: 0;
-  color: var(--main-color);
-}
-
-.status {
-  width: 15px;
-  height: 15px;
-  background-color: #4caf50;
-  border-radius: 50%;
-}
-
-.edit-btn {
-  justify-self: end;
-  padding: 0.4rem 1rem;
-  font-size: 1rem;
-  border-radius: 0.5rem;
-  background-color: var(--main-color);
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-
-.user-bio p {
-  margin: 0;
-  color: #555;
-}
-@media (max-width: 768px) {
-  .avatar {
-    position: static;
-    margin: 0 auto;
-    width: 120px;
-    height: 120px;
-  }
-
-  .avatar-image {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-  }
-
-  .user-details {
-    margin-left: 0;
-    padding: 1rem;
-    text-align: center;
-  }
-
-  .user-status {
-    grid-template-columns: 1fr;
-    row-gap: 0.5rem;
-    justify-items: center;
-  }
-
-  .edit-btn {
-    justify-self: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .user-status h1 {
-    font-size: 1.5rem;
-  }
-
-  .edit-btn {
-    font-size: 0.9rem;
-    padding: 0.3rem 0.8rem;
-  }
-
-  .user-bio p {
-    font-size: 0.95rem;
-  }
-}
-
-</style>

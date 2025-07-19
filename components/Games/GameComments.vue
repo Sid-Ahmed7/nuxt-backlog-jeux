@@ -27,7 +27,7 @@ const fetchComments = async () => {
         .order('created_at', { ascending: false });
 
         if(!error && data) {
-            comments.value = data.map((comment) => ({
+            comments.value = data.map((comment:any) => ({
                 id: comment.id,
                 userId: comment.user_id ?? '',
                 gameId: comment.game_id.toString(),

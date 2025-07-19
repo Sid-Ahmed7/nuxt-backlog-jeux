@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import ProfileHeader from '@/components/Profile/ProfileHeader.vue';
-import ProfileNavBar from '@/components/Profile/ProfileNavBar.vue';
-import GameInProgress from '~/components/Chart/GameStatus.vue';
-import GameByPlatform from '@/components/Chart/GameByPlatform.vue';
-import UserGameCard from '@/components/Games/UserGameCard.vue';
-import Pagination from '@/components/Pagination.vue';
+import { useRouter } from 'vue-router'
+import ProfileHeader from '@/components/Profile/ProfileHeader.vue'
+import ProfileNavBar from '@/components/Profile/ProfileNavBar.vue'
+import GameInProgress from '@/components/Chart/GameStatus.vue'
+import GameByPlatform from '@/components/Chart/GameByPlatform.vue'
+import UserGameCard from '@/components/Games/UserGameCard.vue'
+import Pagination from '@/components/Pagination.vue'
 
-import type { Game } from '@/types/Game';
-import type { UserGame } from '@/types/UserGame';
-
+import type { Game } from '@/types/Game'
+import type { UserGame } from '@/types/UserGame'
 
 const router = useRouter()
 const supabase = useSupabaseClient()
-const userGameStore = useUserGamesStore();
+const userGameStore = useUserGamesStore()
 const authStore = useAuthStore()
-const {transformUserGame} = useGameUtils()
+const { transformUserGame } = useGameUtils()
+
 const user = authStore.user
 const activeTab = ref<'all' | 'stats'>('all')
 const currentPage = ref(1)
@@ -35,7 +35,7 @@ const profile = computed(() => res.value?.data ?? null)
 
 
 const { data: gamesData } = await useAsyncData('detailedUserGames', async () => {
-    if (!user?.id) return []
+  if (!user?.id) return []
 
   await userGameStore.fetchUserGames(user.id)
 
@@ -75,80 +75,55 @@ const totalPages = computed(() => {
 </script>
 
 <template>
+  <div v-if="profile" class="max-w-5xl mx-auto p-6 text-white min-h-screen">
+    <ProfileHeader :user="profile" />
 
- <div v-if="profile" class="profile-container">
-    
-  <ProfileHeader  :user="profile" />
-  <ProfileNavBar :selectTab="activeTab" @update:tab="activeTab = $event" />
-  
-  <div v-if="activeTab === 'all'" class="sub-navbar">
-    
-    <div class="user-games">
-        <UserGameCard
-            v-for="userGame in paginatedGames"
-            :key="userGame.game.id"
-            :games="userGame"
-            ></UserGameCard>
-    </div>
-    <Pagination 
-     v-if="userGamesWithDetails.length > 0"
+    <ProfileNavBar
+      :selectTab="activeTab"
+      @update:tab="activeTab = $event"
+      class="mb-8"
+    />
 
-      :totalPages="totalPages"
-      :currentPage="currentPage"
-      @update:currentPage="currentPage = $event" /> 
-    </div>
+    <div v-if="activeTab === 'all'" class="mt-8">
+  <div class="grid grid-cols-0 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+    <UserGameCard
+      v-for="userGame in paginatedGames"
+      :key="userGame.game.id"
+      :games="userGame"
+    />
+  </div>
 
-    <div v-else-if ="activeTab === 'stats'" class="stats">
-      <div class="chart-card">
-      <GameInProgress :games="userGamesWithDetails" />
-      </div>
-      <div class="chart-card">
-      <GameByPlatform :games="userGamesWithDetails" />
+      <div
+        v-if="userGamesWithDetails.length > 0"
+        class="mt-8 flex justify-center space-x-3 px-4"
+      >
+        <Pagination
+          :totalPages="totalPages"
+          :currentPage="currentPage"
+          @update:currentPage="currentPage = $event"
+        />
       </div>
     </div>
 
-</div>
+    <div
+      v-else-if="activeTab === 'stats'"
+      class="mt-8 flex flex-wrap justify-center gap-6 px-4"
+    >
+      <section
+        class="bg-gray-800 border border-gray-700 rounded-2xl p-6 max-w-xl w-full shadow-lg backdrop-blur-sm"
+      >
+        <GameInProgress :games="userGamesWithDetails" />
+      </section>
 
-<div v-else class="loading">
-  <p>Chargement du profil...</p>
-</div>
+      <section
+        class="bg-gray-800 border border-gray-700 rounded-2xl p-6 max-w-xl w-full shadow-lg backdrop-blur-sm"
+      >
+        <GameByPlatform :games="userGamesWithDetails" />
+      </section>
+    </div>
+  </div>
+
+  <div v-else class="text-center mt-20 text-lg text-gray-400">
+    Chargement du profil...
+  </div>
 </template>
-
-<style scoped>
-
-.user-games {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-  gap:1.5rem;
-  padding: 1rem;
-}
-.sub-navbar {
-  margin-top: 2rem;
-}
-
-.stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  justify-content: center;
-  margin-top: 2rem;
-}
-
-.chart-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  max-width: 600px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(8px);
-}
-
-
-.loading {
-  text-align: center;
-  margin-top: 50px;
-  font-size: 18px;
-}
-</style>
