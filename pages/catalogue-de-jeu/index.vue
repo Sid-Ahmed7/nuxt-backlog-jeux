@@ -15,22 +15,19 @@ const {
   selectedPlatforms,
   selectedGameModes,
   selectedThemes,
-  searchQuery,
-  filteredGames,
   paginatedGames,
   currentPage,
   games,
   totalPages,
   noResults,
   onSearch,
-  gamesPerPage,
   error,
 } = useGameFilters();
 
 const showFilters = ref(false);
 
 watch(
-  () => gameData,
+  () => gameData.value,
   (newGames) => {
     games.value = newGames ?? [];
   },

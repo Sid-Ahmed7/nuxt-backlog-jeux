@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { Game } from "@/types/Game";
 
-const emit = defineEmits(["close", "select"]);
 const props = defineProps<{
   game: Game | null;
 }>();
+const emit = defineEmits(["close", "select"]);
 
 const selectedPlatformId = ref<number | null>(null);
 

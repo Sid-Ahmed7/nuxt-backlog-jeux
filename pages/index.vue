@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import BacklogTrack from '@/components/Home/BacklogTrack.vue'
-import GameListHome from '~/components/Home/GameListHome.vue'
+import GameListHome from '@/components/Home/GameListHome.vue'
 
 const genresStore = useGenresStore()
 const platformsStore = usePlatformsStore()
@@ -76,11 +76,6 @@ onMounted(async () => {
       "
     >
     <GameListHome :games="upComingGames" title="Jeux à venir" >
-      <template #links>
-        <NuxtLink to="/catalogue-de-jeu/prochaine-sortie" class="text-main hover:text-main-hover hover:underline">
-          Voir plus
-        </NuxtLink>
-      </template>
 
       <template #extra-info="{game}">
         <p class="text-sm text-text-secondary mb-1">
@@ -97,7 +92,7 @@ onMounted(async () => {
       </template>   
     </GameListHome>
 
-    <GameListHome :games="topRatedGames" title="Dernière sortie" >
+    <GameListHome :games="topRatedGames" title="Les mieux notés" >
       <template #extra-info="{game}">
         <p class="text-sm text-text-secondary mb-1">
           {{ formatRating(game.total_rating_count) }}

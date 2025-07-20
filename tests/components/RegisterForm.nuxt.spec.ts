@@ -89,9 +89,6 @@ describe('RegisterForm', () => {
         expect(wrapper.text()).toContain("L'email est invalide")
     })
 
-
-
-
         it('verifier si le mot de passe est trop court', async () => {
         const wrapper = mount(RegisterForm, {
             global: {

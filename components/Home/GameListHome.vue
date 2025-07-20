@@ -13,7 +13,6 @@ const { getCoverUrl } = useGameUtils()
     <div class="w-full lg:w-auto">
         <div class="flex justify-between items-center mb-4 text-main">
             <h2 class="text-xl font-semibold">{{ title }}</h2>
-            <slot name="links"></slot>
         </div>
 
         <div v-if="games.length === 0">
