@@ -70,7 +70,7 @@ onMounted(() => {
   <div class="px-6 py-5 bg-zinc-900 rounded-2xl my-8 text-white">
     <h3 class="mb-4 pb-2 border-b-2 border-purple-700 text-xl font-semibold">Commentaires</h3>
 
-    <div v-if="user && props.gameId" class="flex flex-col mb-6">
+    <div v-if="user && gameId" class="flex flex-col mb-6">
       <textarea v-model="newComment" placeholder="Laisse ton avis..." rows="3"  class="p-3 rounded-lg border-none bg-zinc-800 text-white mb-3 resize-none" />
       <button @click="submitComment" :disabled="!newComment.trim()"   class="self-end px-4 py-2 bg-main text-white rounded-lg disabled:bg-main disabled:cursor-not-allowed">
         Envoyer
