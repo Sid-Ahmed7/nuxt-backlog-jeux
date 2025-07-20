@@ -101,9 +101,6 @@ onMounted(async () => {
     }
   }
 })
-
-
-
 </script>
 <template>
   <div class="max-w-xl mx-auto my-16 p-8 rounded-xl">

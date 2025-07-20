@@ -73,7 +73,7 @@ onBeforeUnmount(() => {
     <button
       type="button"
       class="px-4 py-2 rounded text-white bg-gray-800 hover:bg-gray-700 disabled:bg-gray-400/30 disabled:text-gray-900 disabled:cursor-not-allowed cursor-pointer"
-      @click="goToPage(props.currentPage - 1)"
+      @click="goToPage(currentPage - 1)"
       :disabled="!hasPreviousPage"
     >
       <
@@ -85,7 +85,7 @@ onBeforeUnmount(() => {
       @click="goToPage(page)"
       :class="[
         'px-4 py-2 rounded text-white cursor-pointer',
-        page === props.currentPage
+        page === currentPage
           ? 'bg-amber-800 hover:bg-amber-700'
           : 'bg-gray-800 hover:bg-gray-700',
       ]"
@@ -95,7 +95,7 @@ onBeforeUnmount(() => {
     <button
       type="button"
       class="px-4 py-2 rounded text-white bg-gray-800 hover:bg-gray-700 disabled:bg-gray-400/30 disabled:text-gray-900 disabled:cursor-not-allowed cursor-pointer"
-      @click="goToPage(props.currentPage + 1)"
+      @click="goToPage(currentPage + 1)"
       :disabled="!hasNextPage"
     >
       >
@@ -103,7 +103,7 @@ onBeforeUnmount(() => {
     <button
       type="button"
       class="px-4 py-2 rounded text-center text-white bg-gray-800 hover:bg-gray-700 disabled:bg-gray-400/30 disabled:text-gray-900 disabled:cursor-not-allowed cursor-pointer"
-      @click="goToPage(props.totalPages)"
+      @click="goToPage(totalPages)"
       :disabled="!hasNextPage"
     >
       >>

@@ -72,9 +72,9 @@ onUnmounted(() => {
   <div class="fixed inset-0 z-50 bg-black/70 bg-opacity-70 flex items-center justify-center px-4">
     <div class="bg-white rounded-xl w-full max-w-md p-6 space-y-6 shadow-xl">
       <h2 class="text-lg font-semibold text-center text-gray-800">
-        {{ props.statusGame === 'inProgress'
-          ? `Quand avez-vous commencé ${props.game.game.name} ?`
-          : `Quand avez-vous terminé ${props.game.game.name} ?` }}
+        {{ statusGame === 'inProgress'
+          ? `Quand avez-vous commencé ${game.game.name} ?`
+          : `Quand avez-vous terminé ${game.game.name} ?` }}
       </h2>
 
       <div class="space-y-4">
@@ -84,7 +84,7 @@ onUnmounted(() => {
             class="mt-1 block w-full px-3 py-2 text-black border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
 
-        <div v-if="props.statusGame === 'finished'">
+        <div v-if="statusGame === 'finished'">
           <label for="time-input" class="block text-black text-sm font-medium">Temps passé (heures) :</label>
           <input id="time-input" type="number" v-model="selectTimeSpent" min="0" placeholder="Ex: 10"
             class="mt-1 block w-full px-3 py-2 text-black border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />

@@ -68,7 +68,7 @@ onMounted(() => {
       Commentaires
     </h3>
 
-    <div v-if="user && props.gameId" class="flex flex-col mb-6">
+    <div v-if="user && gameId" class="flex flex-col mb-6">
       <textarea
         v-model="newComment"
         placeholder="Laisse ton avis..."

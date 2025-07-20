@@ -1,3 +1,4 @@
+<script setup lang="ts"></script>
 <template>
   <footer class="bg-neutral-900 text-gray-200 py-8">
     <div class="flex flex-col items-center justify-center">

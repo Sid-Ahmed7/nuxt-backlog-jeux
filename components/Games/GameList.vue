@@ -5,7 +5,7 @@ import defaultCover from '@/assets/images/default_cover.png'
 
 const { getCoverUrl } = useGameUtils()
 
-const props = defineProps<{
+defineProps<{
   games: Game[]
   error?: string | null
 }>()
