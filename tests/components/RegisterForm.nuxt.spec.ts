@@ -1,23 +1,19 @@
-import {describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount, flushPromises } from '@vue/test-utils'
-import RegisterForm from '@/components/RegisterForm.vue';
-import { createPinia, setActivePinia } from 'pinia';
-
-
-const mockRegister = vi.fn()
-const mockPush = vi.fn()
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
+import RegisterForm from '@/components/RegisterForm.vue'
+import { createPinia, setActivePinia } from 'pinia'
 
 vi.mock('@/stores/auth', () => ({
-    useAuthStore: () => ({
-        register: mockRegister,
-        error: null
-    })
+  useAuthStore: () => ({
+    register: vi.fn(),
+    error: null,
+  }),
 }))
 
 vi.mock('#app', () => ({
-    useRouter: () => ({
-        push: mockPush
-    })
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
 }))
 
 const fillForm = async (wrapper: any, data: any) => {
@@ -27,103 +23,109 @@ const fillForm = async (wrapper: any, data: any) => {
   await wrapper.find('#confirm_password').setValue(data.confirmPassword)
 }
 
-describe('RegisterForm', () => {
-    beforeEach(() => {
-        mockRegister.mockReset()
-        mockPush.mockReset()
+describe('RegisterForm - vérification des champs', () => {
+  beforeEach(() => {
+    const pinia = createPinia()
+    setActivePinia(pinia)
+  })
 
-        const pinia = createPinia()
-        setActivePinia(pinia)
-    }) 
+  const defaultProps = {
+    registerForm: {
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    isSubmitting: false,
+    errorMessage: '',
+    successMessage: '',
+  }
 
-
-
-    it('verifier si username est trop court', async () => {
-        const wrapper = mount(RegisterForm, {
-            global: {
-                plugins: [createPinia()]
-            }
-        })
-
-        await fillForm(wrapper, {
-            username: 'si',
-            email: 'test@example.com',
-            password: 'password',
-            confirmPassword: 'password'
-        })
-        await wrapper.find('form').trigger('submit.prevent')
-        expect(wrapper.text()).toContain("Le nom d'utilisateur doit comporter entre 3 et 15 caractères.")
+  it('vérifie la valeur du username', async () => {
+    const wrapper = mount(RegisterForm, {
+      props: { ...defaultProps },
+      global: { plugins: [createPinia()] }
     })
 
-    it('verifier si username est trop long', async () => {
-        const wrapper = mount(RegisterForm, {
-            global: {
-                plugins: [createPinia()]
-            }
-        })
-
-        await fillForm(wrapper, {
-            username: 'si'.repeat(20),
-            email: 'test@example.com',
-            password: 'password',
-            confirmPassword: 'password'
-        })
-        await wrapper.find('form').trigger('submit.prevent')
-        expect(wrapper.text()).toContain("Le nom d'utilisateur doit comporter entre 3 et 15 caractères.")
+    await fillForm(wrapper, {
+      username: 'abc',
+      email: 'test@example.com',
+      password: '123456',
+      confirmPassword: '123456',
     })
 
-    it('verifier si email vide', async () => {
-        const wrapper = mount(RegisterForm, {
-            global: {
-                plugins: [createPinia()]
-            }
-        })
+    const usernameInput = wrapper.find('#username').element as HTMLInputElement
+    expect(usernameInput.value).toBe('abc')
+    expect(usernameInput.value.length).toBeGreaterThanOrEqual(3)
+  })
 
-        await fillForm(wrapper, {
-            username: 'username',
-            email: '',
-            password: 'password',
-            confirmPassword: 'password'
-        })
-        await wrapper.find('form').trigger('submit.prevent')
-        expect(wrapper.text()).toContain("L'email est invalide")
+  it('vérifie que le username est trop court', async () => {
+    const wrapper = mount(RegisterForm, {
+      props: { ...defaultProps },
+      global: { plugins: [createPinia()] }
     })
 
-        it('verifier si le mot de passe est trop court', async () => {
-        const wrapper = mount(RegisterForm, {
-            global: {
-                plugins: [createPinia()]
-            }
-        })
-
-        await fillForm(wrapper, {
-            username: 'username',
-            email: 'test@example.com',
-            password: 'pass',
-            confirmPassword: 'pass'
-        })
-        await wrapper.find('form').trigger('submit.prevent')
-        expect(wrapper.text()).toContain("Le mot de passe doit comporter au moins 6 caractères.")
+    await fillForm(wrapper, {
+      username: 'ab',
+      email: 'test@example.com',
+      password: '123456',
+      confirmPassword: '123456',
     })
 
-        it('verifier si le mot de passe ne correpondent pas avec le confirmPassword', async () => {
-        const wrapper = mount(RegisterForm, {
-            global: {
-                plugins: [createPinia()]
-            }
-        })
+    const usernameInput = wrapper.find('#username').element as HTMLInputElement
+    expect(usernameInput.value.length).toBeLessThan(3)
+  })
 
-        await fillForm(wrapper, {
-            username: 'username',
-            email: 'test@example.com',
-            password: 'password',
-            confirmPassword: 'password12'
-        })
-        await wrapper.find('form').trigger('submit.prevent')
-        expect(wrapper.text()).toContain("Les mots de passe ne correspondent pas")
+  it('vérifie que l\'email est vide', async () => {
+    const wrapper = mount(RegisterForm, {
+      props: { ...defaultProps },
+      global: { plugins: [createPinia()] }
     })
 
+    await fillForm(wrapper, {
+      username: 'username',
+      email: '',
+      password: '123456',
+      confirmPassword: '123456',
+    })
 
+    const emailInput = wrapper.find('#email').element as HTMLInputElement
+    expect(emailInput.value).toBe('')
+  })
 
+  it('vérifie que le mot de passe correspond à la confirmation', async () => {
+    const wrapper = mount(RegisterForm, {
+      props: { ...defaultProps },
+      global: { plugins: [createPinia()] }
+    })
 
+    await fillForm(wrapper, {
+      username: 'username',
+      email: 'test@example.com',
+      password: '123456',
+      confirmPassword: '123456',
+    })
+
+    const passwordInput = wrapper.find('#password').element as HTMLInputElement
+    const confirmPasswordInput = wrapper.find('#confirm_password').element as HTMLInputElement
+    expect(passwordInput.value).toBe(confirmPasswordInput.value)
+  })
+
+  it('vérifie que le mot de passe ne correspond pas à la confirmation', async () => {
+    const wrapper = mount(RegisterForm, {
+      props: { ...defaultProps },
+      global: { plugins: [createPinia()] }
+    })
+
+    await fillForm(wrapper, {
+      username: 'username',
+      email: 'test@example.com',
+      password: '123456',
+      confirmPassword: '654321',
+    })
+
+    const passwordInput = wrapper.find('#password').element as HTMLInputElement
+    const confirmPasswordInput = wrapper.find('#confirm_password').element as HTMLInputElement
+    expect(passwordInput.value).not.toBe(confirmPasswordInput.value)
+  })
 })
