@@ -1,94 +1,22 @@
 <script setup lang="ts">
-import type { RegisterData } from "@/types/RegisterData";
+import type { RegisterData } from '@/types/RegisterData'
 
-const router = useRouter();
-const authStore = useAuthStore();
-const registerForm = ref<RegisterData>({
-  username: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-});
+const props = defineProps<{
+  registerForm: RegisterData
+  isSubmitting: boolean
+  errorMessage: string
+  successMessage: string
+}>()
 
-const errorMessage = ref<string>("");
-const successMessage = ref<string>("");
-const isSubmitting = ref<boolean>(false);
-
-const validateForm = (): boolean => {
+const emit = defineEmits<{
+  (e: 'submit', registerData: RegisterData): void
+}>()
 
 
-  if(!registerForm.value.username &&
-     !registerForm.value.email &&
-     !registerForm.value.password &&
-     !registerForm.value.confirmPassword
-    ) {
-      errorMessage.value = "Veuillez remplir tous les champ";
-      return false
-    }  
-   else if (
-    !registerForm.value.username ||
-    registerForm.value.username.length < 3 ||
-    registerForm.value.username.length > 15
-  ) {
-    errorMessage.value =
-      "Le nom d'utilisateur doit comporter entre 3 et 15 caractères.";
-    return false;
-  }
-  else if (!registerForm.value.email) {
-    errorMessage.value = "L'email est invalide.";
-    return false;
-  }
 
-  else if (!registerForm.value.password || registerForm.value.password.length < 6) {
-    errorMessage.value =
-      "Le mot de passe doit comporter au moins 6 caractères.";
-    return false;
-  }
-  else if (registerForm.value.password !== registerForm.value.confirmPassword) {
-    errorMessage.value = "Les mots de passe ne correspondent pas.";
-    return false;
-  } else {
-  errorMessage.value = "";
-  return true;
-  }
-
-};
-
-const registerUser = async () => {
-  if (!validateForm()) {
-    return;
-  }
-
-  isSubmitting.value = true;
-  errorMessage.value = "";
-  successMessage.value = "";
-
-  try {
-    const response = await authStore.register({
-      username: registerForm.value.username,
-      email: registerForm.value.email,
-      password: registerForm.value.password,
-    });
-
-    if (authStore.error) {
-      errorMessage.value = authStore.error;
-    } else {
-      successMessage.value = response;
-      registerForm.value = {
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      };
-
-      router.push("/login");
-    }
-  } catch (error) {
-    errorMessage.value = (error as Error).message;
-  } finally {
-    isSubmitting.value = false;
-  }
-};
+const onSubmit = () => {
+  emit('submit', props.registerForm)
+}
 </script>
 
 <template>
@@ -100,7 +28,7 @@ const registerUser = async () => {
         Inscription
       </h2>
 
-      <form @submit.prevent="registerUser" class="flex flex-col space-y-4">
+      <form @submit.prevent="onSubmit" class="flex flex-col space-y-4">
         <div class="w-full">
           <input
             type="text"
