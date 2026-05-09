@@ -1,75 +1,102 @@
-# Nuxt Minimal Starter
+# Backlog de Jeux
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Application web de gestion de backlog de jeux vidéo. Suivez vos jeux, gérez votre collection et visualisez vos statistiques.
 
-## Setup
+## Stack technique
 
-Make sure to install dependencies:
+- **[Nuxt 3](https://nuxt.com)** — Framework Vue.js full-stack
+- **[Supabase](https://supabase.com)** — Base de données et authentification
+- **[Pinia](https://pinia.vuejs.org)** — Gestion d'état
+- **[Nuxt UI](https://ui.nuxt.com)** — Composants UI
+- **[Tailwind CSS v4](https://tailwindcss.com)** — Styles
+- **[Chart.js](https://www.chartjs.org) / vue-chartjs** — Graphiques et statistiques
+- **[IGDB API](https://api-docs.igdb.com)** — Données des jeux vidéo
+
+## Prérequis
+
+- Node.js >= 18
+- Un projet [Supabase](https://supabase.com) configuré
+- Des credentials [IGDB / Twitch](https://api-docs.igdb.com/#account-creation) (Client ID + Access Token)
+
+## Installation
+
+### 1. Cloner le dépôt
 
 ```bash
-# npm
+git clone <url-du-repo>
+cd nuxt-backlog-jeux
+```
+
+### 2. Installer les dépendances
+
+```bash
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
+### 3. Configurer les variables d'environnement
 
-Start the development server on `http://localhost:3000`:
+Créer un fichier `.env` à la racine du projet :
+
+```env
+# Supabase
+SUPABASE_URL=https://xxxx.supabase.co
+SUPABASE_KEY=your_supabase_anon_key
+
+# IGDB API (via Twitch Developer)
+API_CLIENT_ID=your_twitch_client_id
+API_ACCESS_TOKEN=your_twitch_access_token
+```
+
+> Pour obtenir les credentials IGDB, créez une application sur [dev.twitch.tv](https://dev.twitch.tv/console) puis suivez la [documentation IGDB](https://api-docs.igdb.com/#account-creation).
+
+### 4. Lancer en développement
 
 ```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+L'application est disponible sur `http://localhost:3000`
 
-Build the application for production:
+## Scripts disponibles
 
-```bash
-# npm
-npm run build
+| Commande | Description |
+|---|---|
+| `npm run dev` | Lance le serveur de développement |
+| `npm run build` | Compile pour la production |
+| `npm run preview` | Previsualise le build de production |
+| `npm run generate` | Génère un site statique |
+| `npm test` | Lance les tests (Vitest) |
 
-# pnpm
-pnpm build
+## Pages
 
-# yarn
-yarn build
+| Route | Description | Auth requise |
+|---|---|---|
+| `/` | Page d'accueil | Non |
+| `/catalogue-de-jeu` | Catalogue de jeux avec filtres | Non |
+| `/catalogue-de-jeu/[slug]` | Detail d'un jeu | Non |
+| `/profile` | Profil utilisateur et backlog | Oui |
+| `/edit-profile/[userId]` | Modifier le profil | Oui |
+| `/login` | Connexion | Non |
+| `/signup` | Inscription | Non |
+| `/duel` | Mode duel entre jeux | Oui |
+| `/a-propos` | A propos du projet | Non |
 
-# bun
-bun run build
+## Structure du projet
+
 ```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
+nuxt-backlog-jeux/
+├── assets/          # Images et styles globaux
+├── components/      # Composants Vue réutilisables
+│   ├── Chart/       # Graphiques (statuts, plateformes)
+│   ├── Games/       # Composants liés aux jeux
+│   ├── Home/        # Composants de la page d'accueil
+│   └── Profile/     # Composants du profil
+├── composables/     # Logique réutilisable (useGames, useGameFilters)
+├── layouts/         # Layouts Nuxt
+├── middleware/      # Middleware d'authentification
+├── pages/           # Pages (routage automatique)
+├── server/api/      # Routes API serveur (appels IGDB)
+├── stores/          # Stores Pinia
+├── tests/           # Tests Vitest
+└── types/           # Types TypeScript
 ```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
