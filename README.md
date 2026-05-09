@@ -67,20 +67,6 @@ L'application est disponible sur `http://localhost:3000`
 | `npm run generate` | Génère un site statique |
 | `npm test` | Lance les tests (Vitest) |
 
-## Pages
-
-| Route | Description | Auth requise |
-|---|---|---|
-| `/` | Page d'accueil | Non |
-| `/catalogue-de-jeu` | Catalogue de jeux avec filtres | Non |
-| `/catalogue-de-jeu/[slug]` | Detail d'un jeu | Non |
-| `/profile` | Profil utilisateur et backlog | Oui |
-| `/edit-profile/[userId]` | Modifier le profil | Oui |
-| `/login` | Connexion | Non |
-| `/signup` | Inscription | Non |
-| `/duel` | Mode duel entre jeux | Oui |
-| `/a-propos` | A propos du projet | Non |
-
 ## Structure du projet
 
 ```
